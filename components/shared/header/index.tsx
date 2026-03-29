@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { APP_NAME } from "@/lib/constants";
-import { ShoppingCart, UserIcon } from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
+import Menu from "./menu";
 
 const Header = () => {
   return (
@@ -13,9 +13,11 @@ const Header = () => {
             <Image
               src="/images/naga-steel-depot.png"
               alt={`${APP_NAME} logo`}
-              height={300}
               width={300}
-              priority={true}
+              height={300}
+              sizes="(max-width: 640px) 120px, (max-width: 1024px) 200px, 300px"
+              style={{ width: "100%", height: "auto" }}
+              priority
             />
             {/* <span className="hidden lg:block font-bold text-2xl ml-3">
               {APP_NAME}
@@ -24,17 +26,7 @@ const Header = () => {
         </div>
 
         <div className="space-x-2">
-          <Button asChild variant="ghost">
-            <Link href="/cart">
-              <ShoppingCart /> Cart
-            </Link>
-          </Button>
-
-          <Button asChild variant="ghost">
-            <Link href="/sign-in">
-              <UserIcon /> Sign In
-            </Link>
-          </Button>
+          <Menu />
         </div>
       </div>
     </header>
