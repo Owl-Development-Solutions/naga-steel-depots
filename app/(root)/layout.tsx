@@ -1,6 +1,12 @@
 import Footer from "@/components/footer";
 import Header from "@/components/shared/header";
 
+export const metadata = {
+  title: " Your Trusted Steel Supplier",
+  description:
+    "High-quality steel products for construction, fabrication, and industrial needs.",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -8,9 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex h-screen flex-col">
-      <Header />
-      <main className="flex-1 wrapper">{children}</main>
-      <Footer />
+      <main>{children}</main>
     </div>
   );
 }
