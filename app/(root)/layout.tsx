@@ -1,6 +1,3 @@
-import Footer from "@/components/footer";
-import Header from "@/components/shared/header";
-
 export const metadata = {
   title: " Your Trusted Steel Supplier",
   description:
