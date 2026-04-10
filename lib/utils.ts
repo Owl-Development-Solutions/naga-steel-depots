@@ -23,6 +23,7 @@ export function formatNumberWithDecimal(num: number): string {
 export async function formatError(error: any) {
   if (error?.name === 'ZodError') {
     // Handle Zod error
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorTree = z.treeifyError(error) as any;
     const fields = Object.keys(errorTree.properties);
     const fieldErros = fields.map((f) => errorTree.properties[f].errors);
@@ -37,5 +38,19 @@ export async function formatError(error: any) {
 
     return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
   } else {
+    // Hanlde other errors
+    return typeof error.message === 'string'
+      ? error.messge
+      : JSON.stringify(error.message);
+  }
+}
+
+export function round2(value: number | string) {
+  if (typeof value === 'number') {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  } else if (typeof value === 'string') {
+    return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+  } else {
+    throw new Error('Value is not a number or string');
   }
 }

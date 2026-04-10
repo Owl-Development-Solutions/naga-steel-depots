@@ -1,7 +1,9 @@
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import { PrismaClient } from "@/lib/generated/prisma/client";
-import ws from "ws";
+import 'server-only';
+
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { PrismaNeon } from '@prisma/adapter-neon';
+import { PrismaClient } from '@/lib/generated/prisma/client';
+import ws from 'ws';
 
 // Sets up WebSocket connections, which enables Neon to use WebSocket communication.
 neonConfig.webSocketConstructor = ws;
