@@ -1,12 +1,17 @@
-'use server';
+"use server";
 
-import { siginInFormSchema, siginUpFormSchema } from '../validator';
-import { signIn, signOut } from '@/auth';
-import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { prisma } from '@/db/prisma';
-import { hashSync } from 'bcrypt-ts-edge';
-import { formatError } from '../utils';
-import z from 'zod';
+import {
+  shippingAddressSchema,
+  siginInFormSchema,
+  siginUpFormSchema,
+} from "../validator";
+import { auth, signIn, signOut } from "@/auth";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { prisma } from "@/db/prisma";
+import { hashSync } from "bcrypt-ts-edge";
+import { formatError } from "../utils";
+import z from "zod";
+import { ShippingAddress } from "@/types";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -15,13 +20,13 @@ export async function signInWithCredentials(
 ) {
   try {
     const user = siginInFormSchema.parse({
-      email: formData.get('email'),
-      password: formData.get('password'),
+      email: formData.get("email"),
+      password: formData.get("password"),
     });
 
-    await signIn('credentials', user);
+    await signIn("credentials", user);
 
-    return { success: true, message: 'Sign in successfully' };
+    return { success: true, message: "Sign in successfully" };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
@@ -29,7 +34,7 @@ export async function signInWithCredentials(
 
     return {
       success: false,
-      message: 'Invalid email or password',
+      message: "Invalid email or password",
     };
   }
 }
@@ -43,10 +48,10 @@ export async function signOutUser() {
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
     const user = siginUpFormSchema.parse({
-      name: formData.get('name'),
-      email: formData.get('email'),
-      password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword'),
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
     });
 
     const plainPassword = user.password;
@@ -61,20 +66,59 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       },
     });
 
-    await signIn('credentials', {
+    await signIn("credentials", {
       email: user.email,
       password: plainPassword,
     });
 
     return {
       success: true,
-      message: 'User registered successfully',
+      message: "User registered successfully",
     };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+export async function getUserById(userId: string) {
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+}
+
+export async function updateUserAddress(data: ShippingAddress) {
+  try {
+    const session = await auth();
+
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+
+    if (!currentUser) throw new Error("User not found");
+
+    const address = shippingAddressSchema.parse(data);
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: { address },
+    });
+
+    return {
+      success: true,
+      message: "User updated successfully",
+    };
+  } catch (error) {
     return {
       success: false,
       message: formatError(error),
