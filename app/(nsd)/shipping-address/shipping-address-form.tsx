@@ -211,7 +211,7 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
         </FieldGroup>
 
         <div className="flex gap-2">
-          <Button type="submit" disabled={isPending} className="w-full">
+          <Button type="submit" disabled={isPending}>
             <ArrowRight className="w-4 h-4" />
             Continue
           </Button>
