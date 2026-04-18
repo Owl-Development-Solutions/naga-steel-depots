@@ -1,6 +1,6 @@
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import z from 'zod';
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import z from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,29 +13,60 @@ export function convertToPlainObject<T>(value: T): T {
 
 //format number with decimal places
 export function formatNumberWithDecimal(num: number): string {
-  const [int, decimal] = num.toString().split('.');
+  const [int, decimal] = num.toString().split(".");
 
-  return decimal ? `${int}.${decimal.padEnd(2, '0')}` : `${int}.00`;
+  return decimal ? `${int}.${decimal.padEnd(2, "0")}` : `${int}.00`;
 }
 
 // Format errors
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function formatError(error: any) {
-  if (error?.name === 'ZodError') {
+  if (error?.name === "ZodError") {
     // Handle Zod error
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const errorTree = z.treeifyError(error) as any;
     const fields = Object.keys(errorTree.properties);
     const fieldErros = fields.map((f) => errorTree.properties[f].errors);
 
-    return fieldErros.join('. ');
+    return fieldErros.join(". ");
   } else if (
-    error.name === 'PrismaClientKnownRequestError' &&
-    error.code === 'P2002'
+    error.name === "PrismaClientKnownRequestError" &&
+    error.code === "P2002"
   ) {
     const field =
-      error.meta?.driverAdapterError.cause.constraint.fields[0] || 'Field';
+      error.meta?.driverAdapterError.cause.constraint.fields[0] || "Field";
 
     return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists.`;
   } else {
+    // Hanlde other errors
+    return typeof error.message === "string"
+      ? error.messge
+      : JSON.stringify(error.message);
+  }
+}
+
+export function round2(value: number | string) {
+  if (typeof value === "number") {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+  } else if (typeof value === "string") {
+    return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+  } else {
+    throw new Error("Value is not a number or string");
+  }
+}
+
+const CURRENCY_FORMATTER = new Intl.NumberFormat("en-PH", {
+  style: "currency",
+  currency: "PHP",
+  maximumFractionDigits: 2,
+});
+
+export function formatCurrency(amount: number | string | null) {
+  if (typeof amount === "number") {
+    return CURRENCY_FORMATTER.format(amount);
+  } else if (typeof amount === "string") {
+    return CURRENCY_FORMATTER.format(Number(amount));
+  } else {
+    return "NaN";
   }
 }
