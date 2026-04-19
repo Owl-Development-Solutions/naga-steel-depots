@@ -1,13 +1,13 @@
-'use server';
+"use server";
 
-import { CartItem } from '@/types';
-import { cookies } from 'next/headers';
-import { convertToPlainObject, formatError, round2 } from '../utils';
-import { auth } from '@/auth';
-import { prisma } from '@/db/prisma';
-import { cartItemSchema, insertCartSchema } from '@/lib/validator';
-import { revalidatePath } from 'next/cache';
-import { Prisma } from '../generated/prisma/browser';
+import { CartItem } from "@/types";
+import { cookies } from "next/headers";
+import { convertToPlainObject, formatError, round2 } from "../utils";
+import { auth } from "@/auth";
+import { prisma } from "@/db/prisma";
+import { cartItemSchema, insertCartSchema } from "@/lib/validator";
+import { revalidatePath } from "next/cache";
+import { Prisma } from "../generated/prisma/browser";
 
 //calculate art prices
 const calcPrice = (items: CartItem[]) => {
@@ -30,9 +30,9 @@ const calcPrice = (items: CartItem[]) => {
 export async function addItemToCart(data: CartItem) {
   try {
     //check for cart cookie
-    const sessionCartId = (await cookies()).get('sessionCartId')?.value;
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
-    if (!sessionCartId) throw new Error('Cart session not found');
+    if (!sessionCartId) throw new Error("Cart session not found");
 
     //get session and user id
     const session = await auth();
@@ -49,7 +49,7 @@ export async function addItemToCart(data: CartItem) {
       where: { id: item.productId },
     });
 
-    if (!product) throw new Error('Product not Found');
+    if (!product) throw new Error("Product not Found");
 
     if (!cart) {
       //create new cart obj
@@ -81,7 +81,7 @@ export async function addItemToCart(data: CartItem) {
       if (existItem) {
         //check stock
         if (product.stock < existItem.qty + 1) {
-          throw new Error('Not enough stock');
+          throw new Error("Not enough stock");
         }
 
         //increase the quantity
@@ -91,7 +91,7 @@ export async function addItemToCart(data: CartItem) {
       } else {
         //if item does not exist in cart
         //check stock
-        if (product.stock < 1) throw new Error('Not enough stock');
+        if (product.stock < 1) throw new Error("Not enough stock");
         //add item to the cart.items
         cart.items.push(item);
       }
@@ -110,7 +110,7 @@ export async function addItemToCart(data: CartItem) {
       return {
         success: true,
         message: `${product.name} ${
-          existItem ? 'updated in' : 'added to'
+          existItem ? "updated in" : "added to"
         } cart`,
       };
     }
@@ -123,9 +123,9 @@ export async function addItemToCart(data: CartItem) {
 }
 
 export async function getMyCart() {
-  const sessionCartId = (await cookies()).get('sessionCartId')?.value;
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
-  if (!sessionCartId) throw new Error('Cart session not found');
+  if (!sessionCartId) throw new Error("Cart session not found");
 
   //get session and user id
   const session = await auth();
@@ -151,28 +151,28 @@ export async function getMyCart() {
 
 export async function removeItemFromCart(productId: string) {
   try {
-    const sessionCartId = (await cookies()).get('sessionCartId')?.value;
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
-    if (!sessionCartId) throw new Error('Cart session not found');
+    if (!sessionCartId) throw new Error("Cart session not found");
 
     //get product
     const product = await prisma.product.findFirst({
       where: { id: productId },
     });
 
-    if (!product) throw new Error('Product not found');
+    if (!product) throw new Error("Product not found");
 
     //get user cart
     const cart = await getMyCart();
 
-    if (!cart) throw new Error('Cart not found');
+    if (!cart) throw new Error("Cart not found");
 
     //check for item
     const exist = (cart.items as CartItem[]).find(
       (x) => x.productId === productId,
     );
 
-    if (!exist) throw new Error('Item not found');
+    if (!exist) throw new Error("Item not found");
 
     //check if only one in qty
     if (exist.qty === 1) {
