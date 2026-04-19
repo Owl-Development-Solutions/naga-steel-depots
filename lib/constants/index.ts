@@ -32,7 +32,7 @@ export const shippingAddressDefaultValues = {
 export const PAYMENT_METHODS = [
   {
     id: "paypal",
-    value: "PayPal",
+    value: "Paypal",
     label: "PayPal",
     description: "Pay securely using your PayPal account",
     icon: Wallet,
@@ -58,4 +58,4 @@ export const PAYMENT_METHODS = [
 
 export const PAYMENT_METHOD_VALUES = PAYMENT_METHODS.map((m) => m.value);
 
-export const DEFAULT_PAYMENT_METHOD = process.env.PAYMENT_METHODS || "PayPal";
+export const DEFAULT_PAYMENT_METHOD = process.env.PAYMENT_METHODS || "Paypal";

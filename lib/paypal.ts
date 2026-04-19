@@ -26,6 +26,20 @@ export const paypal = {
 
     return handleReponse(response);
   },
+  capturePayment: async function capturePayment(orderId: string) {
+    const accessToken = await generateAccessToken();
+    const url = `${base}/v2/checkout/orders/${orderId}/capture`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return handleReponse(response);
+  },
 };
 
 // generate paypal access token
@@ -45,14 +59,9 @@ async function generateAccessToken() {
     },
   });
 
-  if (response.ok) {
-    const jsonData = await response.json();
+  const jsonData = await handleReponse(response);
 
-    return jsonData.access_token;
-  } else {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage);
-  }
+  return jsonData.access_token;
 }
 
 async function handleReponse(response: Response) {
