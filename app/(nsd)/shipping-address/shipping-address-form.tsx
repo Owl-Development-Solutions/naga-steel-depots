@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { updateUserAddress } from "@/lib/actions/user.actions";
+import { Spinner } from "@/components/ui/spinner";
 
 const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
   const router = useRouter();
@@ -212,7 +213,11 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
 
         <div className="flex gap-2">
           <Button type="submit" disabled={isPending}>
-            <ArrowRight className="w-4 h-4" />
+            {isPending ? (
+              <Spinner className="w-4 h-4 animate-spin" />
+            ) : (
+              <ArrowRight className="w-4 h-4" />
+            )}{" "}
             Continue
           </Button>
         </div>
