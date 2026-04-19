@@ -8,26 +8,7 @@ const Header = () => {
   return (
     <header className="w-full border-b">
       <div className="wrapper flex-between">
-        <div className="flex-start">
-          <Link href="/" className="flex-start">
-            <Image
-              src="/images/naga-steel-depot.png"
-              alt={`${APP_NAME} logo`}
-              width={300}
-              height={300}
-              sizes="(max-width: 640px) 120px, (max-width: 1024px) 200px, 300px"
-              style={{ width: "100%", height: "auto" }}
-              priority
-            />
-            {/* <span className="hidden lg:block font-bold text-2xl ml-3">
-              {APP_NAME}
-            </span> */}
-          </Link>
-        </div>
-
-        <div className="space-x-2">
-          <Menu />
-        </div>
+        {/* Content removed */}
       </div>
     </header>
   );
