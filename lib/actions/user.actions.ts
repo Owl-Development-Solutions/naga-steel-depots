@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  paymentMethodSchema,
   shippingAddressSchema,
   siginInFormSchema,
   siginUpFormSchema,
@@ -24,7 +25,15 @@ export async function signInWithCredentials(
       password: formData.get("password"),
     });
 
-    await signIn("credentials", user);
+    // Find user to check role before signing in
+    const dbUser = await prisma.user.findFirst({
+      where: { email: user.email as string },
+    });
+
+    await signIn("credentials", {
+      ...user,
+      callbackUrl: dbUser?.role === "admin" ? "/admin/overview" : "/products",
+    });
 
     return { success: true, message: "Sign in successfully" };
   } catch (error) {
@@ -41,7 +50,13 @@ export async function signInWithCredentials(
 
 // Sign user out
 export async function signOutUser() {
-  await signOut();
+  const session = await auth();
+  const isAdmin = session?.user?.role === "admin";
+  if (isAdmin) {
+    await signOut({ redirectTo: "/sign-in" });
+  } else {
+    await signOut();
+  }
 }
 
 // Sign up user
@@ -69,6 +84,7 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     await signIn("credentials", {
       email: user.email,
       password: plainPassword,
+      callbackUrl: "/products",
     });
 
     return {
@@ -123,5 +139,33 @@ export async function updateUserAddress(data: ShippingAddress) {
       success: false,
       message: formatError(error),
     };
+  }
+}
+
+//update user's payment method
+export async function updateUserPaymentMethod(
+  data: z.infer<typeof paymentMethodSchema>,
+) {
+  try {
+    const session = await auth();
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+
+    if (!currentUser) throw new Error("User not found");
+
+    const paymentMethod = paymentMethodSchema.parse(data);
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: { paymentMethod: paymentMethod.type },
+    });
+
+    return {
+      success: true,
+      message: "User updated successfully",
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
   }
 }

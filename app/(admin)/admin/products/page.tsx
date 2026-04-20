@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,7 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,20 +26,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Eye, 
-  Edit, 
+} from "@/components/ui/dropdown-menu";
+import {
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
   Trash2,
   MoreHorizontal,
   Package,
   Plus,
   TrendingUp,
-  TrendingDown
-} from "lucide-react"
+  TrendingDown,
+} from "lucide-react";
 
 const products = [
   {
@@ -91,7 +97,7 @@ const products = [
     revenue: "₱666,400",
     trend: "up",
   },
-]
+];
 
 export default function ProductsPage() {
   return (
@@ -121,7 +127,9 @@ export default function ProductsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Products
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -138,9 +146,7 @@ export default function ProductsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
-              +5 from yesterday
-            </p>
+            <p className="text-xs text-muted-foreground">+5 from yesterday</p>
           </CardContent>
         </Card>
         <Card>
@@ -150,9 +156,7 @@ export default function ProductsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,234</div>
-            <p className="text-xs text-muted-foreground">
-              +8% from last month
-            </p>
+            <p className="text-xs text-muted-foreground">+8% from last month</p>
           </CardContent>
         </Card>
         <Card>
@@ -211,19 +215,28 @@ export default function ProductsPage() {
             </TableHeader>
             <TableBody>
               {products.map((product) => (
-                <TableRow key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <TableRow
+                  key={product.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
                   <TableCell className="font-medium">{product.id}</TableCell>
                   <TableCell>
                     <div>
                       <div className="font-medium">{product.name}</div>
-                      <div className="text-sm text-muted-foreground">{product.category}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {product.category}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>{product.category}</TableCell>
                   <TableCell className="font-medium">{product.price}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span className={product.stock < 50 ? "text-red-600 font-medium" : ""}>
+                      <span
+                        className={
+                          product.stock < 50 ? "text-red-600 font-medium" : ""
+                        }
+                      >
                         {product.stock}
                       </span>
                       {product.stock < 50 && (
@@ -234,9 +247,9 @@ export default function ProductsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge 
+                    <Badge
                       variant={
-                        product.status === 'active' ? 'default' : 'secondary'
+                        product.status === "active" ? "default" : "secondary"
                       }
                       className="capitalize"
                     >
@@ -246,14 +259,16 @@ export default function ProductsPage() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <span>{product.sales}</span>
-                      {product.trend === 'up' ? (
+                      {product.trend === "up" ? (
                         <TrendingUp className="h-3 w-3 text-green-600" />
                       ) : (
                         <TrendingDown className="h-3 w-3 text-red-600" />
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">{product.revenue}</TableCell>
+                  <TableCell className="font-medium">
+                    {product.revenue}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -287,5 +302,5 @@ export default function ProductsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
