@@ -59,20 +59,24 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                         <span className="px-2">{item.name}</span>
                       </Link>
                     </TableCell>
-                    <TableCell className="flex-center gap-2">
-                      <RemoveItemCartButton
-                        item={item}
-                        isPending={isPending}
-                        startTransition={startTransition}
-                      />
-                      <span>{item.qty}</span>
-                      <AddToCartItemButton
-                        item={item}
-                        isPending={isPending}
-                        startTransition={startTransition}
-                      />
+                    <TableCell>
+                      <div className="flex-center gap-2">
+                        <RemoveItemCartButton
+                          item={item}
+                          isPending={isPending}
+                          startTransition={startTransition}
+                        />
+                        <span>{item.qty}</span>
+                        <AddToCartItemButton
+                          item={item}
+                          isPending={isPending}
+                          startTransition={startTransition}
+                        />
+                      </div>
                     </TableCell>
-                    <TableCell className="text-right">₱{item.price}</TableCell>
+                    <TableCell className="text-center ">
+                      ₱{item.price}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
