@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,6 +12,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { FaPesoSign } from "react-icons/fa6";
+import { requireStaff } from "@/lib/auth-guard";
 
 const stats = {
   totalProducts: 156,
@@ -72,7 +71,9 @@ const getActivityIcon = (type: string) => {
   }
 };
 
-export default function StaffDashboard() {
+export default async function StaffDashboard() {
+  await requireStaff();
+
   return (
     <main className=" mx-auto ">
       <div className="flex items-center gap-4 mb-5">
