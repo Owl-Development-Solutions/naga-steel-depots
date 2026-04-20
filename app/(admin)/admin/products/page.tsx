@@ -115,7 +115,7 @@ export default function ProductsPage() {
             Export
           </Button>
           <Button asChild size="sm">
-            <Link href="/admin/products/new">
+            <Link href="/admin/products/create-product">
               <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -110,9 +111,11 @@ export default function UsersPage() {
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button size="sm">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add User
+          <Button asChild size="sm">
+            <Link href="/admin/users/add-user">
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add User
+            </Link>
           </Button>
         </div>
       </div>
