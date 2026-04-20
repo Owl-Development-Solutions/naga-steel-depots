@@ -71,6 +71,13 @@ export function formatCurrency(amount: number | string | null) {
   }
 }
 
+//format number
+const NUMBER_FORMATTER = new Intl.NumberFormat("en-PH");
+
+export function formatNumber(num: number) {
+  return NUMBER_FORMATTER.format(num);
+}
+
 //shorten UUID
 export function formatId(id: string) {
   return `..${id.substring(id.length - 6)}`;

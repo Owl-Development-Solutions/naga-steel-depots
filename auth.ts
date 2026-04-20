@@ -11,6 +11,7 @@ import { NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
 
 export const config = {
+  secret: process.env.NEXTAUTH_SECRET || 'development-secret-key-change-in-production',
   pages: {
     signIn: "/sign-in",
     error: "/sign-in",

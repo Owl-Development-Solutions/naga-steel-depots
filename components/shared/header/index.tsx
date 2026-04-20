@@ -19,12 +19,8 @@ const Header = () => {
               style={{ width: "100%", height: "auto" }}
               priority
             />
-            {/* <span className="hidden lg:block font-bold text-2xl ml-3">
-              {APP_NAME}
-            </span> */}
           </Link>
         </div>
-
         <div className="space-x-2">
           <Menu />
         </div>

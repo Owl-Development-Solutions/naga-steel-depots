@@ -1,7 +1,18 @@
 import type { NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
 
+// Get the NEXTAUTH_SECRET from environment
+const getAuthSecret = () => {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    console.warn('NEXTAUTH_SECRET is not set. Using fallback for development.');
+    return 'development-secret-key-change-in-production';
+  }
+  return secret;
+};
+
 export const authConfig = {
+  secret: getAuthSecret(),
   providers: [],
   callbacks: {
     authorized({ request, auth }: any) {
@@ -13,7 +24,7 @@ export const authConfig = {
         /\/profile/,
         /\/user\/(.*)/,
         /\/order\/(.*)/,
-        /\/admin/,
+        // /\/admin/, // Admin panel accessible without authentication
       ];
 
       //get pathname from the request url object
