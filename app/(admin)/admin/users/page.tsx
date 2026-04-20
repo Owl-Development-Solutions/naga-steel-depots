@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,22 +25,22 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Eye, 
-  Edit, 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
   Trash2,
   MoreHorizontal,
   Users,
   UserPlus,
   Shield,
   Mail,
-  Calendar
-} from "lucide-react"
+  Calendar,
+} from "lucide-react";
 
 const users = [
   {
@@ -87,7 +93,7 @@ const users = [
     lastActive: "2024-04-16",
     orders: 12,
   },
-]
+];
 
 export default function UsersPage() {
   return (
@@ -132,9 +138,7 @@ export default function UsersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">7,234</div>
-            <p className="text-xs text-muted-foreground">
-              +8% from last month
-            </p>
+            <p className="text-xs text-muted-foreground">+8% from last month</p>
           </CardContent>
         </Card>
         <Card>
@@ -156,9 +160,7 @@ export default function UsersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">
-              No change
-            </p>
+            <p className="text-xs text-muted-foreground">No change</p>
           </CardContent>
         </Card>
       </div>
@@ -176,10 +178,7 @@ export default function UsersPage() {
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search users..."
-                  className="pl-10 w-64"
-                />
+                <Input placeholder="Search users..." className="pl-10 w-64" />
               </div>
               <Button variant="outline" size="sm">
                 <Filter className="mr-2 h-4 w-4" />
@@ -203,24 +202,40 @@ export default function UsersPage() {
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <TableRow
+                  key={user.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={`/images/naga-steel-depot.png`} alt={user.name} />
-                        <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        <AvatarImage
+                          src={`/images/naga-steel-depot.png`}
+                          alt={user.name}
+                        />
+                        <AvatarFallback>
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="font-medium">{user.name}</div>
-                        <div className="text-sm text-muted-foreground">{user.email}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {user.email}
+                        </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge 
+                    <Badge
                       variant={
-                        user.role === 'admin' ? 'default' : 
-                        user.role === 'moderator' ? 'secondary' : 'outline'
+                        user.role === "admin"
+                          ? "default"
+                          : user.role === "moderator"
+                            ? "secondary"
+                            : "outline"
                       }
                       className="capitalize"
                     >
@@ -228,8 +243,10 @@ export default function UsersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={user.status === 'active' ? 'default' : 'secondary'}
+                    <Badge
+                      variant={
+                        user.status === "active" ? "default" : "secondary"
+                      }
                       className="capitalize"
                     >
                       {user.status}
@@ -275,5 +292,5 @@ export default function UsersPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

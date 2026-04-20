@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,20 +25,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Eye, 
-  Edit, 
+} from "@/components/ui/dropdown-menu";
+import {
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
   Trash2,
   MoreHorizontal,
   Calendar,
   User,
   Package,
-  CreditCard
-} from "lucide-react"
+  CreditCard,
+} from "lucide-react";
+import { requireAdmin } from "@/lib/auth-guard";
 
 const orders = [
   {
@@ -90,7 +97,7 @@ const orders = [
     date: "2024-04-16",
     items: 15,
   },
-]
+];
 
 export default function OrdersPage() {
   return (
@@ -130,14 +137,14 @@ export default function OrdersPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pending Orders
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
-              +5 from yesterday
-            </p>
+            <p className="text-xs text-muted-foreground">+5 from yesterday</p>
           </CardContent>
         </Card>
         <Card>
@@ -147,9 +154,7 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">45</div>
-            <p className="text-xs text-muted-foreground">
-              +8 from yesterday
-            </p>
+            <p className="text-xs text-muted-foreground">+8 from yesterday</p>
           </CardContent>
         </Card>
         <Card>
@@ -179,10 +184,7 @@ export default function OrdersPage() {
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search orders..."
-                  className="pl-10 w-64"
-                />
+                <Input placeholder="Search orders..." className="pl-10 w-64" />
               </div>
               <Button variant="outline" size="sm">
                 <Filter className="mr-2 h-4 w-4" />
@@ -207,27 +209,38 @@ export default function OrdersPage() {
             </TableHeader>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <TableRow
+                  key={order.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
                   <TableCell className="font-medium">{order.id}</TableCell>
                   <TableCell>
                     <div>
                       <div className="font-medium">{order.customer}</div>
-                      <div className="text-sm text-muted-foreground">{order.email}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {order.email}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
                       <div className="font-medium">{order.product}</div>
-                      <div className="text-sm text-muted-foreground">{order.items} items</div>
+                      <div className="text-sm text-muted-foreground">
+                        {order.items} items
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">{order.amount}</TableCell>
                   <TableCell>
-                    <Badge 
+                    <Badge
                       variant={
-                        order.status === 'completed' ? 'default' : 
-                        order.status === 'processing' ? 'secondary' : 
-                        order.status === 'shipped' ? 'outline' : 'destructive'
+                        order.status === "completed"
+                          ? "default"
+                          : order.status === "processing"
+                            ? "secondary"
+                            : order.status === "shipped"
+                              ? "outline"
+                              : "destructive"
                       }
                       className="capitalize"
                     >
@@ -235,10 +248,13 @@ export default function OrdersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge 
+                    <Badge
                       variant={
-                        order.payment === 'paid' ? 'default' : 
-                        order.payment === 'pending' ? 'secondary' : 'destructive'
+                        order.payment === "paid"
+                          ? "default"
+                          : order.payment === "pending"
+                            ? "secondary"
+                            : "destructive"
                       }
                       className="capitalize"
                     >
@@ -279,5 +295,5 @@ export default function OrdersPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

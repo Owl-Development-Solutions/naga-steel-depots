@@ -26,7 +26,8 @@ const SignInPage = async (props: {
 
   const session = await auth();
   if (session) {
-    return redirect(callbackUrl || "/products");
+    const redirectUrl = callbackUrl || (session.user.role === "admin" ? "/admin/overview" : "/products");
+    return redirect(redirectUrl);
   }
 
   return (
