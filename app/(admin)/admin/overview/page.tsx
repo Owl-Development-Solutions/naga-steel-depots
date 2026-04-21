@@ -124,7 +124,7 @@ const AdminOverviewPage = async () => {
       <div className="relative grid gap-4 md:grid-cols-2 kg:grid-cols-7 ">
         <Card className="cols-span-4">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
+            <CardTitle>Overview Sales per Day</CardTitle>
           </CardHeader>
           <CardContent>
             <Charts
