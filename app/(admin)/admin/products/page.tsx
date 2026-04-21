@@ -33,16 +33,14 @@ import {
   Edit,
   Trash2,
   MoreHorizontal,
-  Package,
   Plus,
   TrendingUp,
   TrendingDown,
-  AlertTriangle,
-  ShoppingCart,
-  CreditCard,
 } from "lucide-react";
-import { getProductCardDetails } from "@/lib/actions/product.actions";
-import InfoCardDetails from "@/components/shared/info-card";
+import { deleteProduct, getAllProducts } from "@/lib/actions/product.actions";
+import { formatCurrency, formatId } from "@/lib/utils";
+import DeleteDialog from "@/components/shared/delete-dialog";
+import Pagination from "@/components/shared/pagination";
 
 const products = [
   {
@@ -115,6 +113,14 @@ export default async function ProductsPage(props: {
   const searchText = searchParams.query || "";
   const category = searchParams.category || "";
 
+  const productsData = await getAllProducts({
+    query: searchText,
+    page,
+    category,
+  });
+
+  console.log(productsData);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -125,12 +131,12 @@ export default async function ProductsPage(props: {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
             Export
-          </Button>
+          </Button> */}
           <Button asChild size="sm">
-            <Link href="/admin/products/create-product">
+            <Link href="/admin/products/create">
               <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Link>
@@ -139,133 +145,72 @@ export default async function ProductsPage(props: {
       </div>
 
       {/* Products Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Product Inventory</CardTitle>
-              <CardDescription>
-                Manage your products and track inventory levels
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search products..."
-                  className="pl-10 w-64"
-                />
-              </div>
-              <Button variant="outline" size="sm">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Sales</TableHead>
-                <TableHead>Revenue</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((product) => (
-                <TableRow
-                  key={product.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  <TableCell className="font-medium">{product.id}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{product.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {product.category}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell className="font-medium">{product.price}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={
-                          product.stock < 50 ? "text-red-600 font-medium" : ""
-                        }
-                      >
-                        {product.stock}
-                      </span>
-                      {product.stock < 50 && (
-                        <Badge variant="destructive" className="text-xs">
-                          Low Stock
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        product.status === "active" ? "default" : "secondary"
-                      }
-                      className="capitalize"
-                    >
-                      {product.status}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Product ID</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Stock</TableHead>
+            <TableHead>Rating</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {productsData.data.map((product) => (
+            <TableRow
+              key={product.id}
+              className="hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <TableCell className="font-medium">
+                {formatId(product.id)}
+              </TableCell>
+              <TableCell>
+                <div>
+                  <div className="font-medium">{product.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {product.category}
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>{product.category}</TableCell>
+              <TableCell className="font-medium">
+                {formatCurrency(product.price)}
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={
+                      product.stock < 50 ? "text-red-600 font-medium" : ""
+                    }
+                  >
+                    {product.stock}
+                  </span>
+                  {product.stock < 50 && (
+                    <Badge variant="destructive" className="text-xs">
+                      Low Stock
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span>{product.sales}</span>
-                      {product.trend === "up" ? (
-                        <TrendingUp className="h-3 w-3 text-green-600" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3 text-red-600" />
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {product.revenue}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit product
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete product
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>{product.rating}</TableCell>
+              <TableCell className="flex gap-1">
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`/admin/products/${product.id}`}>Edit</Link>
+                </Button>
+                <DeleteDialog id={product.id} action={deleteProduct as any} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {productsData.totalPage > 1 && (
+        <Pagination
+          page={page}
+          totalPages={productsData.totalPage}
+        ></Pagination>
+      )}
     </div>
   );
 }

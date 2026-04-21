@@ -1,60 +1,32 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Check } from "lucide-react"
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { CheckIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-interface CheckboxProps {
-  checked?: boolean
-  onCheckedChange?: (checked: boolean) => void
-  disabled?: boolean
-  className?: string
-  id?: string
+function Checkbox({
+  className,
+  ...props
+}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+  return (
+    <CheckboxPrimitive.Root
+      data-slot="checkbox"
+      className={cn(
+        "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    >
+      <CheckboxPrimitive.Indicator
+        data-slot="checkbox-indicator"
+        className="flex items-center justify-center text-current transition-none"
+      >
+        <CheckIcon className="size-3.5" />
+      </CheckboxPrimitive.Indicator>
+    </CheckboxPrimitive.Root>
+  );
 }
 
-const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ checked = false, onCheckedChange, disabled = false, className, id, ...props }, ref) => {
-    const [isChecked, setIsChecked] = React.useState(checked)
-
-    React.useEffect(() => {
-      setIsChecked(checked)
-    }, [checked])
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newChecked = e.target.checked
-      setIsChecked(newChecked)
-      onCheckedChange?.(newChecked)
-    }
-
-    return (
-      <div className="relative">
-        <input
-          type="checkbox"
-          ref={ref}
-          id={id}
-          checked={isChecked}
-          onChange={handleChange}
-          disabled={disabled}
-          className="sr-only"
-          {...props}
-        />
-        <div
-          className={cn(
-            "h-4 w-4 shrink-0 rounded-sm border border-gray-300 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer",
-            isChecked && "bg-blue-600 border-blue-600",
-            className
-          )}
-          onClick={() => !disabled && onCheckedChange?.(!isChecked)}
-        >
-          {isChecked && (
-            <Check className="h-3 w-3 text-white flex items-center justify-center" />
-          )}
-        </div>
-      </div>
-    )
-  }
-)
-Checkbox.displayName = "Checkbox"
-
-export { Checkbox }
+export { Checkbox };
