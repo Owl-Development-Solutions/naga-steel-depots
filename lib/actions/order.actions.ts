@@ -6,7 +6,7 @@ import { getUserById } from "./user.actions";
 import { insertOrderSchema } from "../validator";
 import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult } from "@/types";
-import { convertToPlainObject, formatError } from "../utils";
+import { convertToPlainObject, formatError, formatNumber } from "../utils";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
@@ -337,8 +337,9 @@ export async function getOrderCardDetails() {
         prisma.order.count({
           where: {
             paymentMethod: {
-              in: ["PayPal", "Stripe"],
+              in: ["Paypal", "Stripe"],
             },
+            isPaid: false,
           },
         }),
 
@@ -358,24 +359,21 @@ export async function getOrderCardDetails() {
         icon: "package",
         amount: totalOrders.toString(),
         description: "Orders made",
+        bgColor: "bg-primary",
       },
       {
         title: "Pending Orders",
         icon: "calendar",
         amount: pendingOrders.toString(),
         description: "Unpaid orders",
+        bgColor: "bg-primary-secondary",
       },
       {
         title: "Processing",
         icon: "package",
         amount: processingOrders.toString(),
-        description: "PayPal payments",
-      },
-      {
-        title: "Income",
-        icon: "creditCard",
-        amount: `₱${(revenue._sum.totalPrice || 0).toLocaleString()}`,
-        description: "Total paid sales",
+        description: "Online payment made (Unpaid)",
+        bgColor: "bg-warning",
       },
     ];
 

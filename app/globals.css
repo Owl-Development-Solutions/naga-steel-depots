@@ -329,3 +329,8 @@ html.dark .upload-field .text-white {
     transform: rotate(1turn);
   }
 }
+
+.icon-display {
+  transform: scale(8);
+  opacity: 0.1;
+}
