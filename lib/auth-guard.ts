@@ -10,3 +10,13 @@ export async function requireAdmin() {
 
   return session;
 }
+
+export async function requireStaff() {
+  const session = await auth();
+
+  if (session?.user?.role !== "staff") {
+    redirect("/unauthorized");
+  }
+
+  return session;
+}

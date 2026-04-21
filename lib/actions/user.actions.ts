@@ -32,7 +32,12 @@ export async function signInWithCredentials(
 
     await signIn("credentials", {
       ...user,
-      callbackUrl: dbUser?.role === "admin" ? "/admin/overview" : "/products",
+      callbackUrl:
+        dbUser?.role === "admin"
+          ? "/admin/overview"
+          : dbUser?.role === "staff"
+            ? "/staff/dashboard"
+            : "/products",
     });
 
     return { success: true, message: "Sign in successfully" };
@@ -52,7 +57,8 @@ export async function signInWithCredentials(
 export async function signOutUser() {
   const session = await auth();
   const isAdmin = session?.user?.role === "admin";
-  if (isAdmin) {
+  const isStaff = session?.user.role === "staff";
+  if (isAdmin || isStaff) {
     await signOut({ redirectTo: "/sign-in" });
   } else {
     await signOut();

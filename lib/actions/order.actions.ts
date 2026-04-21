@@ -11,6 +11,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma/client";
+import { PAGE_SIZE } from "../constants";
 
 //create order and create the order items
 export async function createOrder() {
@@ -318,4 +319,138 @@ export async function getOrderSummary() {
     latestSales,
     salesData,
   };
+}
+
+//get the total card details process, revenue for admin ...
+export async function getOrderCardDetails() {
+  try {
+    const [totalOrders, pendingOrders, processingOrders, revenue] =
+      await Promise.all([
+        prisma.order.count(),
+
+        prisma.order.count({
+          where: {
+            isPaid: false,
+          },
+        }),
+
+        prisma.order.count({
+          where: {
+            paymentMethod: {
+              in: ["PayPal", "Stripe"],
+            },
+          },
+        }),
+
+        prisma.order.aggregate({
+          _sum: {
+            totalPrice: true,
+          },
+          where: {
+            isPaid: true,
+          },
+        }),
+      ]);
+
+    const cardDetails = [
+      {
+        title: "Total Orders",
+        icon: "package",
+        amount: totalOrders.toString(),
+        description: "Orders made",
+      },
+      {
+        title: "Pending Orders",
+        icon: "calendar",
+        amount: pendingOrders.toString(),
+        description: "Unpaid orders",
+      },
+      {
+        title: "Processing",
+        icon: "package",
+        amount: processingOrders.toString(),
+        description: "PayPal payments",
+      },
+      {
+        title: "Income",
+        icon: "creditCard",
+        amount: `₱${(revenue._sum.totalPrice || 0).toLocaleString()}`,
+        description: "Total paid sales",
+      },
+    ];
+
+    return {
+      success: true,
+      data: convertToPlainObject(cardDetails),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+//get all orders
+export async function getAllOrders({
+  limit = PAGE_SIZE,
+  page,
+  query,
+}: {
+  limit?: number;
+  page: number;
+  query: string;
+}) {
+  const queryFilter: Prisma.OrderWhereInput =
+    query && query !== "all"
+      ? {
+          user: {
+            name: {
+              contains: query,
+              mode: "insensitive",
+            } as Prisma.StringFilter,
+          },
+        }
+      : {};
+
+  const data = await prisma.order.findMany({
+    where: {
+      ...queryFilter,
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: (page - 1) * limit,
+    include: {
+      user: { select: { name: true } },
+      orderitems: { select: { product: true } },
+    },
+  });
+
+  const dataCount = await prisma.order.count();
+
+  return {
+    data,
+    totalPages: Math.ceil(dataCount / limit),
+  };
+}
+
+//delete an order
+export async function deleteOrder(id: string) {
+  try {
+    await prisma.order.delete({
+      where: { id },
+    });
+
+    revalidatePath("/admin/orders");
+
+    return {
+      success: true,
+      message: "Order deleted successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
