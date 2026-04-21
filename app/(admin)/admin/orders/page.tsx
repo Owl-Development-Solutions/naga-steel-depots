@@ -5,46 +5,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import {
-  Download,
-  Calendar,
-  Package,
-  CreditCard,
-  SearchIcon,
-} from "lucide-react";
+import { Download, Calendar, Package, CreditCard } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-guard";
-import InfoCardDetails from "@/components/shared/infor-card";
-import {
-  deleteOrder,
-  getAllOrders,
-  getOrderCardDetails,
-} from "@/lib/actions/order.actions";
+import { getAllOrders, getOrderCardDetails } from "@/lib/actions/order.actions";
 import { auth } from "@/auth";
-import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
 import Link from "next/link";
-import DeleteDialog from "@/components/shared/delete-dialog";
 import Pagination from "@/components/shared/pagination";
-import { Suspense } from "react";
 import OrdersTable from "./orders-table";
-import TableSkeleton from "@/components/shared/table-skeleton";
-
-const iconMap = {
-  package: Package,
-  calendar: Calendar,
-  creditCard: CreditCard,
-};
 
 export default async function OrdersPage(props: {
   searchParams: Promise<{
@@ -53,7 +21,6 @@ export default async function OrdersPage(props: {
   }>;
 }) {
   await requireAdmin();
-  const cardDetails = await getOrderCardDetails();
 
   const { page = 1, query: searchText } = await props.searchParams;
 
@@ -84,23 +51,6 @@ export default async function OrdersPage(props: {
             Export
           </Button>
         </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {cardDetails.data!.map((card, idx) => {
-          const Icon = iconMap[card.icon as keyof typeof iconMap];
-
-          return (
-            <InfoCardDetails
-              title={card.title}
-              description={card.description}
-              key={idx}
-              icon={Icon}
-              amount={card.amount}
-            />
-          );
-        })}
       </div>
 
       {/* Orders Table */}

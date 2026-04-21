@@ -10,7 +10,7 @@ import { auth, signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { prisma } from "@/db/prisma";
 import { hashSync } from "bcrypt-ts-edge";
-import { formatError } from "../utils";
+import { convertToPlainObject, formatError } from "../utils";
 import z from "zod";
 import { ShippingAddress } from "@/types";
 
@@ -175,3 +175,82 @@ export async function updateUserPaymentMethod(
     return { success: false, message: formatError(error) };
   }
 }
+
+export const getUserCardDetails = async () => {
+  try {
+    const now = new Date();
+
+    const last7Days = new Date();
+    last7Days.setDate(now.getDate() - 7);
+
+    const last30Days = new Date();
+    last30Days.setDate(now.getDate() - 30);
+
+    const [totalUsers, activeUsers, newUsers, adminUsers] = await Promise.all([
+      prisma.user.count(),
+
+      prisma.user.count({
+        where: {
+          updatedAt: {
+            gte: last30Days,
+          },
+        },
+      }),
+
+      prisma.user.count({
+        where: {
+          createdAt: {
+            gte: last7Days,
+          },
+        },
+      }),
+
+      prisma.user.count({
+        where: {
+          role: "admin",
+        },
+      }),
+    ]);
+
+    const data = [
+      {
+        title: "Total Users",
+        icon: "users",
+        amount: totalUsers.toString(),
+        description: "All registered users",
+        bgColor: "bg-primary",
+      },
+      {
+        title: "Active Users",
+        icon: "activity",
+        amount: activeUsers.toString(),
+        description: "Active in last 30 days",
+        bgColor: "bg-green",
+      },
+      {
+        title: "New Users",
+        icon: "userPlus",
+        amount: newUsers.toString(),
+        description: "Joined in last 7 days",
+        bgColor: "bg-accent",
+      },
+      {
+        title: "Admin Users",
+        icon: "shield",
+        amount: adminUsers.toString(),
+        description: "Users with admin role",
+        bgColor: "bg-primary-secondary",
+      },
+    ];
+
+    return {
+      success: true,
+      data: convertToPlainObject(data),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: await formatError(error),
+    };
+  }
+};

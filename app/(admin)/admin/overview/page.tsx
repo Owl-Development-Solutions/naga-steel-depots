@@ -8,19 +8,59 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderSummary } from "@/lib/actions/order.actions";
-import { formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
 import {
+  getOrderCardDetails,
+  getOrderSummary,
+} from "@/lib/actions/order.actions";
+import {
+  formatCurrency,
+  formatDateTime,
+  formatNumber,
+  getTitleBasedOnTime,
+} from "@/lib/utils";
+import {
+  Activity,
+  AlertTriangle,
   BadgeDollarSign,
   Barcode,
+  Calendar,
+  CreditCard,
   CreditCardIcon,
+  Package,
   PhilippinePeso,
+  ShieldIcon,
+  ShoppingCart,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import Charts from "./charts";
 import { requireAdmin } from "@/lib/auth-guard";
+import InfoCardDetails from "@/components/shared/info-card";
+import { Button } from "@/components/ui/button";
+import { getProductCardDetails } from "@/lib/actions/product.actions";
+import { getUserCardDetails } from "@/lib/actions/user.actions";
+
+const iconProductMap = {
+  package: Package,
+  alertTriangle: AlertTriangle,
+  shoppingCart: ShoppingCart,
+  creditCard: CreditCard,
+};
+
+const iconOrderMap = {
+  package: Package,
+  calendar: Calendar,
+  creditCard: CreditCard,
+};
+
+const iconUserMap = {
+  users: Users,
+  activity: Activity,
+  userPlus: UserPlus,
+  shield: ShieldIcon,
+};
 
 export const metadata: Metadata = {
   title: "Admin Dashboard",
@@ -30,67 +70,58 @@ const AdminOverviewPage = async () => {
   await requireAdmin();
   const session = await auth();
 
+  const userName = session?.user?.name;
+
   if (session?.user.role === " admin")
     throw new Error("User is not authorized");
 
   const summary = await getOrderSummary();
+  const cardProductData = await getProductCardDetails();
+  const cardOrderData = await getOrderCardDetails();
+  const cardUserData = await getUserCardDetails();
 
   return (
     <div className="space-y-2">
-      <h1 className="h2-bold">Dashboard</h1>
-      <div className="grid gap-4 md:grid-cols 2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <PhilippinePeso />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(
-                summary.totalSales._sum.totalPrice?.toString() || 0,
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex gap-4 items-center">
+        <span className="underline  decoration-[#1F4D72] h2-bold">
+          {getTitleBasedOnTime()}, {userName}
+        </span>
+      </div>
+      <span>Here's the latest report</span>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sales</CardTitle>
-            <CreditCardIcon />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatNumber(summary.ordersCount)}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="mt-3 grid md:grid-cols-2 lg:grid-cols-4">
+        <InfoCardDetails
+          title="Total Revenue"
+          amount={formatCurrency(
+            summary.totalSales._sum.totalPrice?.toString() || 0,
+          )}
+          icon={PhilippinePeso}
+          bgColor="bg-primary"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customers</CardTitle>
-            <Users />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatNumber(summary.usersCount)}
-            </div>
-          </CardContent>
-        </Card>
+        <InfoCardDetails
+          title="Sales"
+          amount={formatNumber(summary.ordersCount)}
+          icon={CreditCardIcon}
+          bgColor="bg-green"
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products</CardTitle>
-            <Barcode />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatNumber(summary.productsCount)}
-            </div>
-          </CardContent>
-        </Card>
+        <InfoCardDetails
+          title="Customers"
+          amount={formatNumber(summary.usersCount)}
+          icon={Users}
+          bgColor="bg-primary-secondary"
+        />
+
+        <InfoCardDetails
+          title="Products"
+          amount={formatNumber(summary.productsCount)}
+          icon={Barcode}
+          bgColor="bg-light-teal"
+        />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 kg:grid-cols-7">
+      <div className="relative grid gap-4 md:grid-cols-2 kg:grid-cols-7 ">
         <Card className="cols-span-4">
           <CardHeader>
             <CardTitle>Overview</CardTitle>
@@ -140,6 +171,78 @@ const AdminOverviewPage = async () => {
           </CardContent>
         </Card>
       </div>
+
+      <div className="mt-10">
+        <span className=" flex text-center gap-3 h3-bold">Products</span>{" "}
+        <span>Quick overview of your product inventory</span>
+      </div>
+
+      <Link href="/admin/products">
+        <div className="mt-2 grid md:grid-cols-2 lg:grid-cols-4">
+          {cardProductData.data!.map((card, idx) => {
+            const Icon =
+              iconProductMap[card.icon as keyof typeof iconProductMap];
+            return (
+              <InfoCardDetails
+                title={card.title}
+                description={card.description}
+                key={idx}
+                icon={Icon}
+                amount={card.amount}
+                bgColor={card.bgColor}
+              />
+            );
+          })}
+        </div>
+      </Link>
+
+      {/* Orders */}
+      <div className="mt-10">
+        <span className=" flex text-center gap-3 h3-bold">Orders</span>{" "}
+        <span>Overview of recent orders and their status</span>
+      </div>
+      <Link href="/admin/orders">
+        <div className="mt-2 grid md:grid-cols-2 lg:grid-cols-3">
+          {cardOrderData.data!.map((card, idx) => {
+            const Icon = iconOrderMap[card.icon as keyof typeof iconOrderMap];
+
+            return (
+              <InfoCardDetails
+                title={card.title}
+                description={card.description}
+                key={idx}
+                icon={Icon}
+                amount={card.amount}
+                bgColor={card.bgColor}
+              />
+            );
+          })}
+        </div>
+      </Link>
+
+      {/* Users */}
+      <div className="mt-10">
+        <span className=" flex text-center gap-3 h3-bold">Users</span>{" "}
+        <span>Overview of users and their stats</span>
+      </div>
+      <Link href="/admin/users">
+        <div className="mt-2 grid md:grid-cols-2 lg:grid-cols-4">
+          {cardUserData.data!.map((card, idx) => {
+            const Icon = iconUserMap[card.icon as keyof typeof iconUserMap];
+
+            return (
+              <InfoCardDetails
+                title={card.title}
+                description={card.description}
+                key={idx}
+                icon={Icon}
+                amount={card.amount}
+                bgColor={card.bgColor}
+              />
+            );
+          })}
+        </div>
+      </Link>
     </div>
   );
 };

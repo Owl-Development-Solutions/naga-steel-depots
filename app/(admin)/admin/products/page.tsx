@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import {
   Card,
@@ -39,7 +37,12 @@ import {
   Plus,
   TrendingUp,
   TrendingDown,
+  AlertTriangle,
+  ShoppingCart,
+  CreditCard,
 } from "lucide-react";
+import { getProductCardDetails } from "@/lib/actions/product.actions";
+import InfoCardDetails from "@/components/shared/info-card";
 
 const products = [
   {
@@ -99,7 +102,19 @@ const products = [
   },
 ];
 
-export default function ProductsPage() {
+export default async function ProductsPage(props: {
+  searchParams: Promise<{
+    page: string;
+    query: string;
+    category: string;
+  }>;
+}) {
+  const searchParams = await props.searchParams;
+
+  const page = Number(searchParams.page) || 1;
+  const searchText = searchParams.query || "";
+  const category = searchParams.category || "";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -121,56 +136,6 @@ export default function ProductsPage() {
             </Link>
           </Button>
         </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Products
-            </CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">456</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
-            <TrendingDown className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">+5 from yesterday</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
-            <p className="text-xs text-muted-foreground">+8% from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₱3.2M</div>
-            <p className="text-xs text-muted-foreground">
-              +15% from last month
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Products Table */}
