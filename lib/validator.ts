@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { formatNumberWithDecimal } from "./utils";
 import { PAYMENT_METHOD_VALUES } from "./constants";
+import parsePhoneNumberFromString from "libphonenumber-js";
 
 const currency = z
   .string()
@@ -9,12 +10,22 @@ const currency = z
     "Price must have exactly two decimal places",
   );
 
+// schema for phone number PH
+export const zPhone = z.string().refine((arg) => {
+  const phone = parsePhoneNumberFromString(arg, {
+    defaultCountry: "PH",
+    extract: false,
+  });
+
+  return phone && phone.isValid();
+}, "Invalid phone number");
+
 // schema for inserting products
 export const insertProductSchema = z.object({
   name: z.string().min(3, "Name must be at lest 3 characters"),
   slug: z.string().min(3, "Slug must be at lest 3 characters"),
   category: z.string().min(3, "Category must be at lest 3 characters"),
-  brand: z.string().min(3, "Brand must be at lest 3 characters"),
+  brand: z.string(),
   description: z.string().min(3, "Description must be at lest 3 characters"),
   stock: z.coerce.number(),
   images: z.array(z.string().min(1, "Products must have at least one image")),
@@ -72,6 +83,8 @@ export const insertCartSchema = z.object({
 export const shippingAddressSchema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters"),
   streetAddress: z.string().min(3, "Address must be at least 3 characters"),
+  phoneNumber: zPhone,
+  addressInformation: z.string().optional(),
   city: z.string().min(3, "City must be at least 3 characters"),
   postalCode: z.string().min(3, "Postal code must be at least 3 characters"),
   country: z.string().min(3, "Country must be at least 3 characters"),
@@ -121,14 +134,37 @@ export const paymentResultSchema = z.object({
   pricePaid: z.string(),
 });
 
+//schema for creating user
+export const createUserSchema = z
+  .object({
+    email: z.email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    role: z.string().min(1, "Role is required"),
+    image: z.string().optional(),
+    address: shippingAddressSchema.optional(),
+    confirmPassword: z
+      .string()
+      .min(6, "Confirm password must be at least 6  characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password don't match",
+    path: ["confirmPassword"],
+  });
+
 //schema for updating user profile
 export const updateProfileSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
-  email: z.string().min(3, "Email must be at least 3 characters"),
+  email: z.email("Invalid email address"),
+  phoneNumber: zPhone.optional(),
 });
 
-//schema for update users
-export const updateUserSchema = updateProfileSchema.extend({
-  id: z.string().min(1, "Id is required"),
+//schema for update users (admin)
+export const updateUserSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  email: z.email("Invalid email address"),
   role: z.string().min(1, "Role is required"),
+  image: z.string().optional(),
+  phoneNumber: zPhone.optional(),
+  address: shippingAddressSchema.optional(),
 });

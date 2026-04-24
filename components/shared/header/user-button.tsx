@@ -1,6 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { UserIcon } from "lucide-react";
-import { auth } from "@/auth";
 import { signOutUser } from "@/lib/actions/user.actions";
 import {
   DropdownMenu,
@@ -11,9 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
-const UserButton = async () => {
-  const session = await auth();
-
+const UserButton = ({ session }: { session: any }) => {
   if (!session) {
     return (
       <Button asChild>
@@ -24,7 +23,7 @@ const UserButton = async () => {
     );
   }
 
-  const firstInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
+  const firstInitial = session?.user?.name?.charAt(0).toUpperCase() ?? "U";
 
   return (
     <div className="flex gap-2 items-center">
@@ -43,11 +42,11 @@ const UserButton = async () => {
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               <div className="text-sm font-medium leading-none">
-                {session.user?.name}
+                {session?.user?.name}
               </div>
 
               <div className="text-sm text-muted-foreground leading-none">
-                {session.user?.email}
+                {session?.user?.email}
               </div>
             </div>
           </DropdownMenuLabel>

@@ -96,6 +96,35 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
 
           <div className="flex flex-col md:flex-row gap-5 ">
             <Controller
+              name="phoneNumber"
+              control={form.control}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: ControllerRenderProps<
+                  z.infer<typeof shippingAddressSchema>,
+                  "phoneNumber"
+                >;
+                fieldState: ControllerFieldState;
+              }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Phone Number</FieldLabel>
+                  <Input
+                    placeholder="Enter phone number"
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-5 ">
+            <Controller
               name="streetAddress"
               control={form.control}
               render={({
@@ -112,6 +141,35 @@ const ShippingAddressForm = ({ address }: { address: ShippingAddress }) => {
                   <FieldLabel>Address</FieldLabel>
                   <Input
                     placeholder="Enter Address"
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-5 ">
+            <Controller
+              name="addressInformation"
+              control={form.control}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: ControllerRenderProps<
+                  z.infer<typeof shippingAddressSchema>,
+                  "addressInformation"
+                >;
+                fieldState: ControllerFieldState;
+              }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Address Details</FieldLabel>
+                  <Input
+                    placeholder="Add other details (optional)"
                     {...field}
                     aria-invalid={fieldState.invalid}
                   />

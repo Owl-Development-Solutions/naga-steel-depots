@@ -195,7 +195,7 @@ export default async function ProductsPage(props: {
                 </div>
               </TableCell>
               <TableCell>{product.rating}</TableCell>
-              <TableCell className="flex gap-1">
+              <TableCell className="flex gap-2">
                 <Button asChild variant="outline" size="sm">
                   <Link href={`/admin/products/${product.id}`}>Edit</Link>
                 </Button>

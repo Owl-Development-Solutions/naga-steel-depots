@@ -13,13 +13,16 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const DeleteDialog = ({
   id,
   action,
+  classNames,
 }: {
   id: string;
   action: (id: string) => Promise<{ success: boolean; message: string }>;
+  classNames?: string;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -41,7 +44,11 @@ const DeleteDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button size="sm" variant="destructive" className="ml-2 cursor-pointer">
+        <Button
+          size="sm"
+          variant="destructive"
+          className={cn("cursor-pointer ", classNames)}
+        >
           Delete
         </Button>
       </AlertDialogTrigger>

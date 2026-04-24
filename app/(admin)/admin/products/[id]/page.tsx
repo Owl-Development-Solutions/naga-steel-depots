@@ -4,9 +4,21 @@ import { Product } from "@/types";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Update Product",
-};
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await props.params;
+
+  if (!id) throw new Error("Product not found");
+
+  const res = await getProductById(id);
+
+  if (!res.success) throw new Error("Something went wrong ");
+
+  return {
+    title: `Update - ${res.data?.name}`,
+  };
+}
 
 const AdminProductUpdatePage = async (props: {
   params: Promise<{

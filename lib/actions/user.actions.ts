@@ -1,10 +1,12 @@
 "use server";
 
 import {
+  createUserSchema,
   paymentMethodSchema,
   shippingAddressSchema,
   siginInFormSchema,
   siginUpFormSchema,
+  updateUserSchema,
 } from "../validator";
 import { auth, signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
@@ -12,7 +14,10 @@ import { prisma } from "@/db/prisma";
 import { hashSync } from "bcrypt-ts-edge";
 import { convertToPlainObject, formatError } from "../utils";
 import z from "zod";
-import { ShippingAddress } from "@/types";
+import { ShippingAddress, User } from "@/types";
+import { PAGE_SIZE } from "../constants";
+import { Prisma } from "../generated/prisma/client";
+import { revalidatePath } from "next/cache";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -117,6 +122,26 @@ export async function getUserById(userId: string) {
   if (!user) throw new Error("User not found");
 
   return user;
+}
+
+export async function getUserByIdByProps(userId: string) {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    return {
+      success: true,
+      data: user,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: formatError(error),
+    };
+  }
 }
 
 export async function updateUserAddress(data: ShippingAddress) {
@@ -254,3 +279,125 @@ export const getUserCardDetails = async () => {
     };
   }
 };
+
+//get all users
+export async function getAllUsers({
+  limit = PAGE_SIZE,
+  page,
+  query,
+}: {
+  limit?: number;
+  page: number;
+  query: string;
+}) {
+  const queryFilter: Prisma.UserWhereInput =
+    query && query !== "all"
+      ? {
+          name: {
+            contains: query,
+            mode: "insensitive",
+          } as Prisma.StringFilter,
+        }
+      : {};
+
+  const data = await prisma.user.findMany({
+    where: {
+      ...queryFilter,
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+    skip: (page - 1) * limit,
+  });
+
+  const dataCount = await prisma.user.count();
+
+  return {
+    data,
+    totalPage: Math.ceil(dataCount / limit),
+  };
+}
+
+export async function deleteUser(userId: string) {
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    revalidatePath("/admin/users");
+
+    return {
+      success: true,
+      message: "User deleted sucessfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+export async function createUser(values: User) {
+  try {
+    const user = createUserSchema.parse(values);
+
+    const userFName = user.address?.fullName.split(" ")[0];
+
+    // Hash the password
+    const hashedPassword = hashSync(user.password, 10);
+
+    // Convert address to JSON-serializable object
+    const addressJson = user.address
+      ? JSON.parse(JSON.stringify(user.address))
+      : null;
+
+    const res = await prisma.user.create({
+      data: {
+        name: userFName,
+        email: user.email,
+        password: hashedPassword,
+        role: user.role,
+        image: user.image,
+        phoneNumber: user.address?.phoneNumber || null,
+        address: addressJson,
+      },
+    });
+
+    revalidatePath("/admin/users");
+
+    return {
+      success: true,
+      message: "User created successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+export async function updateUser(data: z.infer<typeof updateUserSchema>) {
+  try {
+    const user = updateUserSchema.parse(data);
+
+    const userExists = await prisma.user.findFirst({
+      where: { id: user.id },
+    });
+
+    if (!userExists) throw new Error("Product not found");
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: user,
+    });
+    revalidatePath("/admin/users");
+
+    return {
+      success: true,
+      message: "Product updated successfully",
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}

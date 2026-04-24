@@ -49,7 +49,6 @@ const ProductForm = ({
   ) => {
     //on create
     if (type === "Create") {
-      console.log("called");
       const res = await createProduct(values);
       if (!res.success) {
         toast.error(res.message);
