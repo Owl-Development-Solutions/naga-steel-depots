@@ -395,7 +395,7 @@ export async function updateUser(data: z.infer<typeof updateUserSchema>) {
 
     return {
       success: true,
-      message: "Product updated successfully",
+      message: "User updated successfully",
     };
   } catch (error) {
     return { success: false, message: formatError(error) };
