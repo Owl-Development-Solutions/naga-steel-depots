@@ -1,3 +1,4 @@
+import { CreateUserInput } from "@/types";
 import { Banknote, CreditCard, Wallet } from "lucide-react";
 
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Naga steel Depots";
@@ -24,6 +25,8 @@ export const signUpDefaultValues = {
 export const shippingAddressDefaultValues = {
   fullName: "",
   streetAddress: "",
+  phoneNumber: "",
+  addressInformation: "",
   city: "",
   postalCode: "",
   country: "",
@@ -75,4 +78,21 @@ export const productDefaultValues = {
   numReviews: "0",
   isFeatured: false,
   banner: null,
+};
+
+export const userCreateDefaultValues: CreateUserInput = {
+  email: "",
+  password: "",
+  confirmPassword: "",
+  role: "",
+  image: "",
+  address: {
+    fullName: "",
+    streetAddress: "",
+    phoneNumber: "",
+    addressInformation: "",
+    city: "",
+    postalCode: "",
+    country: "",
+  },
 };

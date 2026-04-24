@@ -4,12 +4,16 @@ import { APP_NAME } from "@/lib/constants";
 import Menu from "@/components/shared/header/menu";
 import { Input } from "@/components/ui/input";
 import StaffNav from "./main.nav";
+import { auth } from "@/auth";
 
-export default function StaffLayout({
+export default async function StaffLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
+  console.log(session);
   return (
     <>
       <div className="border-b container mx-auto">
@@ -31,7 +35,7 @@ export default function StaffLayout({
               placeholder="Search..."
               className="md:w-[100px] lg:w-[300px]"
             />
-            <Menu />
+            <Menu session={session} />
           </div>
         </div>
       </div>

@@ -5,12 +5,17 @@ import MainNav from "./main.nav";
 import Menu from "@/components/shared/header/menu";
 import { Input } from "@/components/ui/input";
 import AdminSearch from "@/components/admin/admin-search";
+import { auth } from "@/auth";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
+  console.log(session);
+
   return (
     <>
       <div className="border-b container mx-auto">
@@ -28,7 +33,7 @@ export default function AdminLayout({
           <MainNav className="mx-6" />
           <div className="ml-auto items-center flex space-x-4">
             <AdminSearch />
-            <Menu />
+            <Menu session={session} />
           </div>
         </div>
       </div>

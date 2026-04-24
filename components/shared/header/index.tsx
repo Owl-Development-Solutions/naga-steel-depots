@@ -3,8 +3,11 @@ import { APP_NAME } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import Menu from "./menu";
+import { auth } from "@/auth";
 
-const Header = () => {
+const Header = async () => {
+  const session = await auth();
+
   return (
     <header className="w-full border-b">
       <div className="wrapper flex-between">
@@ -22,7 +25,7 @@ const Header = () => {
           </Link>
         </div>
         <div className="space-x-2">
-          <Menu />
+          <Menu session={session} />
         </div>
       </div>
     </header>

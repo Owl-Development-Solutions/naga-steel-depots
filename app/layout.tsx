@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from '@/lib/constants';
-import { ThemeProvider } from 'next-themes';
-import { Toaster } from '@/components/ui/sonner';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from "@/lib/constants";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: {
     template: `%s | Naga Steel Depots`,
@@ -22,14 +22,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang='en'
+      lang="en"
       className={`${inter.className} antialiased`}
       suppressHydrationWarning
     >
-      <body className='min-h-full flex flex-col' suppressHydrationWarning>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <ThemeProvider
-          attribute='class'
-          defaultTheme='light'
+          attribute="class"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
