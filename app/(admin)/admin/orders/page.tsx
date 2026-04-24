@@ -6,13 +6,33 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Calendar, Package, CreditCard } from "lucide-react";
+import {
+  Download,
+  Calendar,
+  Package,
+  CreditCard,
+  ShoppingCart,
+} from "lucide-react";
 import { requireAdmin } from "@/lib/auth-guard";
-import { getAllOrders, getOrderCardDetails } from "@/lib/actions/order.actions";
+import {
+  deleteOrder,
+  getAllOrders,
+  getOrderCardDetails,
+} from "@/lib/actions/order.actions";
 import { auth } from "@/auth";
 import Link from "next/link";
 import Pagination from "@/components/shared/pagination";
-import OrdersTable from "./orders-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
+import DeleteDialog from "@/components/shared/delete-dialog";
+import EmptyHistoryMessage from "@/components/shared/empty-history-message";
 
 export default async function OrdersPage(props: {
   searchParams: Promise<{
@@ -46,52 +66,97 @@ export default async function OrdersPage(props: {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Download className="mr-2 h-4 w-4" />
             Export
-          </Button>
+          </Button> */}
+          {searchText && (
+            <div>
+              Filtered by <i>&quot;{searchText}&quot;</i>
+              <Link href="/admin/products">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="ml-3 cursor-pointer"
+                >
+                  Remove Filter
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Orders Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Recent Orders</CardTitle>
-              <CardDescription>
-                A list of all recent orders including their status.
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              {searchText && (
-                <div>
-                  Filtered by <i>&quot;{searchText}&quot;</i>
-                  <Link href="/admin/orders">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="ml-3 cursor-pointer"
-                    >
-                      Remove Filter
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <OrdersTable page={Number(page)} query={searchText || ""} />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Order ID</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead>Product</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Payment</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
 
-          {orders.totalPages > 1 && (
-            <Pagination
-              page={Number(page) || 1}
-              totalPages={orders?.totalPages}
-            />
+        <TableBody>
+          {orders.data.length ? (
+            orders.data.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{formatId(order.id)}</TableCell>
+                <TableCell>{order.user.name}</TableCell>
+                <TableCell>
+                  {order.orderitems.map((prod) => (
+                    <span key={prod.product.slug}>{prod.product.name}</span>
+                  ))}
+                </TableCell>
+
+                <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+
+                <TableCell>
+                  {order.isDelivered && order.deliveredAt
+                    ? formatDateTime(order.deliveredAt).dateTime
+                    : "Not Delivered"}
+                </TableCell>
+
+                <TableCell>
+                  {order.isPaid && order.paidAt
+                    ? formatDateTime(order.paidAt).dateTime
+                    : "Not Paid"}
+                </TableCell>
+
+                <TableCell>
+                  {formatDateTime(order.createdAt).dateTime}
+                </TableCell>
+
+                <TableCell className="flex gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/order/${order.id}`}>Details</Link>
+                  </Button>
+
+                  <DeleteDialog id={order.id} action={deleteOrder as any} />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={9999} className="h-75">
+                <EmptyHistoryMessage
+                  Icon={ShoppingCart}
+                  message="No records available in the order catalog"
+                />
+              </TableCell>
+            </TableRow>
           )}
-        </CardContent>
-      </Card>
+        </TableBody>
+      </Table>
+
+      {orders.totalPages > 1 && (
+        <Pagination page={Number(page) || 1} totalPages={orders?.totalPages} />
+      )}
     </div>
   );
 }
