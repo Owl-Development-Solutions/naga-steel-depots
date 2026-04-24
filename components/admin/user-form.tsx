@@ -59,7 +59,7 @@ const UserAdminForm = ({
   ) => {
     //on create
     if (type === "Create") {
-      const res = await createUser(values);
+      const res = await createUser(values as User);
 
       if (!res.success) {
         toast.error(res.message);
