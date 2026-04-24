@@ -14,8 +14,6 @@ export default async function AdminLayout({
 }) {
   const session = await auth();
 
-  console.log(session);
-
   return (
     <>
       <div className="border-b container mx-auto">

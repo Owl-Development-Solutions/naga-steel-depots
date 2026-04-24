@@ -15,6 +15,7 @@ export type Product = z.infer<typeof insertProductSchema> & {
   id: string;
   rating: string;
   createdAt: Date;
+  _count?: any;
 };
 
 export type Cart = z.infer<typeof insertCartSchema>;
@@ -40,3 +41,19 @@ export type User = z.infer<typeof createUserSchema> & {
   id?: string;
   name: string;
 };
+
+// Category types
+export type CategoryCount = {
+  category: string | null;
+  _count: number;
+};
+
+export type ProductWithComputed = {
+  price: string;
+  rating: string;
+} & z.infer<typeof insertProductSchema> & {
+    id: string;
+    createdAt: Date;
+    numReviews: number;
+    _count: number;
+  };

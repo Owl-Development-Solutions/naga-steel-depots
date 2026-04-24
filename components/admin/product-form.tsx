@@ -184,7 +184,7 @@ const ProductForm = ({
                 fieldState: ControllerFieldState;
               }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Name</FieldLabel>
+                  <FieldLabel>Category</FieldLabel>
                   <Input
                     placeholder="Enter Category"
                     {...field}

@@ -1,18 +1,24 @@
 import { APP_NAME } from "@/lib/constants";
-
 import Image from "next/image";
 import Link from "next/link";
 import Menu from "./menu";
-import { auth } from "@/auth";
+import { Session } from "next-auth";
+import CategoryDrawer from "./category-drawer";
+import { convertToPlainObject } from "@/lib/utils";
 
-const Header = async () => {
-  const session = await auth();
-
+const Header = ({
+  session,
+  categories,
+}: {
+  session: Session;
+  categories: any;
+}) => {
   return (
     <header className="w-full border-b">
       <div className="wrapper flex-between">
         <div className="flex-start">
-          <Link href="/" className="flex-start">
+          <CategoryDrawer categories={convertToPlainObject(categories)} />
+          <Link href="/" className="flex-start ml-4">
             <Image
               src="/images/naga-steel-depot.png"
               alt={`${APP_NAME} logo`}
