@@ -1,24 +1,7 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Download,
-  Calendar,
-  Package,
-  CreditCard,
-  ShoppingCart,
-} from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { requireAdmin } from "@/lib/auth-guard";
-import {
-  deleteOrder,
-  getAllOrders,
-  getOrderCardDetails,
-} from "@/lib/actions/order.actions";
+import { deleteOrder, getAllOrders } from "@/lib/actions/order.actions";
 import { auth } from "@/auth";
 import Link from "next/link";
 import Pagination from "@/components/shared/pagination";

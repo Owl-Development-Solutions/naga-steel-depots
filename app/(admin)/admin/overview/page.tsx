@@ -38,7 +38,6 @@ import Link from "next/link";
 import Charts from "./charts";
 import { requireAdmin } from "@/lib/auth-guard";
 import InfoCardDetails from "@/components/shared/info-card";
-import { Button } from "@/components/ui/button";
 import { getProductCardDetails } from "@/lib/actions/product.actions";
 import { getUserCardDetails } from "@/lib/actions/user.actions";
 
