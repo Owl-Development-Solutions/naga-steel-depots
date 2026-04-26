@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import {
   approvePaypalOrder,
   createPaypalOrder,
+  deliverOrder,
+  updateOrderToPaidCOD,
 } from "@/lib/actions/order.actions";
 import {
   PayPalButtons,
@@ -93,12 +95,12 @@ const OrderDetailsTable = ({
         disabled={isPending}
         onClick={() =>
           startTransition(async () => {
-            // const res = await updateOrderToPaidCOD(order.id);
-            // if (res.success) {
-            //   toast.success(res.message);
-            // } else {
-            //   toast.error(res.message);
-            // }
+            const res = await updateOrderToPaidCOD(order.id);
+            if (res.success) {
+              toast.success(res.message);
+            } else {
+              toast.error(res.message);
+            }
           })
         }
       >
@@ -115,12 +117,12 @@ const OrderDetailsTable = ({
         disabled={isPending}
         onClick={() =>
           startTransition(async () => {
-            // const res = await deliverOrder(order.id);
-            // if (res.success) {
-            //   toast.success(res.message);
-            // } else {
-            //   toast.error(res.message);
-            // }
+            const res = await deliverOrder(order.id);
+            if (res.success) {
+              toast.success(res.message);
+            } else {
+              toast.error(res.message);
+            }
           })
         }
       >
@@ -246,6 +248,7 @@ const OrderDetailsTable = ({
                   </PayPalScriptProvider>
                 </div>
               )}
+
               {isAdmin && !isPaid && paymentMethod === "CashOnDelivery" && (
                 <MarkAsPaidButton />
               )}

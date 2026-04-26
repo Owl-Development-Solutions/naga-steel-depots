@@ -12,7 +12,11 @@ const Products = async () => {
   return (
     <>
       {featureProducts.length > 0 && <ProductCarousel data={featureProducts} />}
-      <ProductList data={latestProducts} title="" limit={4} />
+      <ProductList
+        data={latestProducts}
+        title="High-Strength Steel Materials for Construction"
+        limit={4}
+      />
       <ViewAllProductsButton />
     </>
   );

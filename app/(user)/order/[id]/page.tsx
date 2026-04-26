@@ -19,6 +19,8 @@ const OrderDetailsPage = async (props: { params: Promise<{ id: string }> }) => {
 
   const session = await auth();
 
+  const isUserAdmin = session?.user?.role === "admin";
+
   return (
     <OrderDetailsTable
       order={{
@@ -26,6 +28,7 @@ const OrderDetailsPage = async (props: { params: Promise<{ id: string }> }) => {
         shippingAddress: order.shippingAddress as ShippingAddress,
       }}
       paypalClientId={process.env.PAYPAL_CLIENT_ID || "sb"}
+      isAdmin={isUserAdmin}
     />
   );
 };
