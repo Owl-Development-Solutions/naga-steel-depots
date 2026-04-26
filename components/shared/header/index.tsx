@@ -5,6 +5,7 @@ import Menu from "./menu";
 import { Session } from "next-auth";
 import CategoryDrawer from "./category-drawer";
 import { convertToPlainObject } from "@/lib/utils";
+import Search from "./search";
 
 const Header = ({
   session,
@@ -30,9 +31,10 @@ const Header = ({
             />
           </Link>
         </div>
-        <div className="space-x-2">
-          <Menu session={session} />
+        <div className="hidden md:block">
+          <Search categories={convertToPlainObject(categories)} />
         </div>
+        <Menu session={session} />
       </div>
     </header>
   );

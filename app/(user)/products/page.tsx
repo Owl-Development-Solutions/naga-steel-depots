@@ -4,6 +4,7 @@ import {
   getFeaturedProducts,
 } from "@/lib/actions/product.actions";
 import ProductCarousel from "@/components/shared/product/product-carousel";
+import ViewAllProductsButton from "@/components/view-all-products-button";
 
 const Products = async () => {
   const latestProducts = await getLatestProducts();
@@ -12,6 +13,7 @@ const Products = async () => {
     <>
       {featureProducts.length > 0 && <ProductCarousel data={featureProducts} />}
       <ProductList data={latestProducts} title="" limit={4} />
+      <ViewAllProductsButton />
     </>
   );
 };
