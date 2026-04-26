@@ -96,3 +96,10 @@ export const userCreateDefaultValues: CreateUserInput = {
     country: "",
   },
 };
+
+export const reviewFormDefaultValues = {
+  title: "",
+  comment: "",
+  rating: 0,
+  updatedAt: new Date(),
+};
