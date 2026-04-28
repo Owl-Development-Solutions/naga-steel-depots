@@ -103,3 +103,5 @@ export const reviewFormDefaultValues = {
   rating: 0,
   updatedAt: new Date(),
 };
+
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || "onboarding@resend.dev";

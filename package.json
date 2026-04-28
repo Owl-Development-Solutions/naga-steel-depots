@@ -9,7 +9,8 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "email:dev": "email dev"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -27,6 +28,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-autoplay": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "esbuild": "^0.28.0",
     "libphonenumber-js": "^1.12.42",
     "lucide-react": "^1.7.0",
     "next": "16.2.1",
@@ -36,9 +38,11 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-email": "^6.0.3",
     "react-hook-form": "^7.72.1",
     "react-icons": "^5.6.0",
     "recharts": "^3.8.1",
+    "resend": "^6.12.2",
     "shadcn": "^4.1.1",
     "slugify": "^1.6.9",
     "sonner": "^2.0.7",
@@ -51,6 +55,7 @@
   },
   "devDependencies": {
     "@prisma/client": "^7.6.0",
+    "@react-email/ui": "^6.0.3",
     "@tailwindcss/postcss": "^4",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.39",
