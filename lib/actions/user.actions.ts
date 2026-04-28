@@ -406,3 +406,34 @@ export async function updateUser(data: z.infer<typeof updateUserSchema>) {
     return { success: false, message: formatError(error) };
   }
 }
+
+//update user profile
+export async function updateUserProfile(user: { name: string; email: string }) {
+  try {
+    const session = await auth();
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+
+    if (!currentUser) throw new Error("User not found");
+
+    await prisma.user.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        name: user.name,
+      },
+    });
+
+    return {
+      success: true,
+      message: "User updated succcessfully",
+    };
+  } catch (error) {
+    return {
+      sucess: false,
+      message: formatError(error),
+    };
+  }
+}

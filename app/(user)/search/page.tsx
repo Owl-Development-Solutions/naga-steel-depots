@@ -5,6 +5,7 @@ import {
   getAllProducts,
 } from "@/lib/actions/product.actions";
 import Link from "next/link";
+import { PagesTopLoader } from "nextjs-toploader/pages";
 
 const prices = [
   {
