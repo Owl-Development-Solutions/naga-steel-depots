@@ -5,13 +5,14 @@ import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
 import { insertOrderSchema } from "../validator";
 import { prisma } from "@/db/prisma";
-import { CartItem, PaymentResult } from "@/types";
+import { CartItem, PaymentResult, ShippingAddress } from "@/types";
 import { convertToPlainObject, formatError, formatNumber } from "../utils";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma/client";
 import { PAGE_SIZE } from "../constants";
+import { sendPurchaseReceipt } from "@/emails";
 
 //create order and create the order items
 export async function createOrder() {
@@ -270,6 +271,14 @@ async function updateOrderToPaid({
   });
 
   if (!updatedOrder) throw new Error("Order not found");
+
+  sendPurchaseReceipt({
+    order: {
+      ...updatedOrder,
+      shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
+      paymentResult: updatedOrder.paymentResult as PaymentResult,
+    },
+  });
 }
 
 type SalesDataType = {
