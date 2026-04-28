@@ -18,6 +18,7 @@ import { ShippingAddress, User } from "@/types";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
+import { getMyCart } from "./cart.actions";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -63,6 +64,10 @@ export async function signOutUser() {
   const session = await auth();
   const isAdmin = session?.user?.role === "admin";
   const isStaff = session?.user.role === "staff";
+
+  const currentCart = await getMyCart();
+  await prisma.cart.delete({ where: { id: currentCart?.id } });
+
   if (isAdmin || isStaff) {
     await signOut({ redirectTo: "/sign-in" });
   } else {
