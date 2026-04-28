@@ -18,6 +18,7 @@ import { ShippingAddress, User } from "@/types";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
+import { getMyCart } from "./cart.actions";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -63,6 +64,10 @@ export async function signOutUser() {
   const session = await auth();
   const isAdmin = session?.user?.role === "admin";
   const isStaff = session?.user.role === "staff";
+
+  const currentCart = await getMyCart();
+  await prisma.cart.delete({ where: { id: currentCart?.id } });
+
   if (isAdmin || isStaff) {
     await signOut({ redirectTo: "/sign-in" });
   } else {
@@ -399,5 +404,36 @@ export async function updateUser(data: z.infer<typeof updateUserSchema>) {
     };
   } catch (error) {
     return { success: false, message: formatError(error) };
+  }
+}
+
+//update user profile
+export async function updateUserProfile(user: { name: string; email: string }) {
+  try {
+    const session = await auth();
+    const currentUser = await prisma.user.findFirst({
+      where: { id: session?.user?.id },
+    });
+
+    if (!currentUser) throw new Error("User not found");
+
+    await prisma.user.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        name: user.name,
+      },
+    });
+
+    return {
+      success: true,
+      message: "User updated succcessfully",
+    };
+  } catch (error) {
+    return {
+      sucess: false,
+      message: formatError(error),
+    };
   }
 }

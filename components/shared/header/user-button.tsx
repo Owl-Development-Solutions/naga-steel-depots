@@ -51,12 +51,36 @@ const UserButton = ({ session }: { session: any }) => {
             </div>
           </DropdownMenuLabel>
 
+          {session?.user.role === "user" && (
+            <>
+              <DropdownMenuItem>
+                <Link href="/order/history" className="w-full">
+                  Order History
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <Link href="/profile" className="w-full">
+                  User Profile
+                </Link>
+              </DropdownMenuItem>
+            </>
+          )}
+
           {session?.user?.role === "admin" && (
-            <DropdownMenuItem>
-              <Link href="/admin/overview" className="w-full">
-                Admin
-              </Link>
-            </DropdownMenuItem>
+            <>
+              {/* <DropdownMenuItem>
+                <Link href="/admin/overview" className="w-full">
+                  Admin
+                </Link>
+              </DropdownMenuItem> */}
+
+              <DropdownMenuItem>
+                <Link href="/admin/profile" className="w-full">
+                  Admin Profile
+                </Link>
+              </DropdownMenuItem>
+            </>
           )}
 
           {session?.user?.role === "staff" && (
