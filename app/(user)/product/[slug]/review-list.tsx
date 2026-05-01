@@ -25,7 +25,7 @@ const ReviewList = ({
   productId,
   productSlug,
 }: {
-  userId: string;
+  userId?: string | null;
   productId: string;
   productSlug: string;
 }) => {
@@ -43,8 +43,10 @@ const ReviewList = ({
 
   useEffect(() => {
     const checkPurchase = async () => {
-      const purchased = await hasUserPurchasedProduct({ productId, userId });
-      setHasPurchased(purchased);
+      if (userId) {
+        const purchased = await hasUserPurchasedProduct({ productId, userId });
+        setHasPurchased(purchased);
+      }
     };
 
     checkPurchase();

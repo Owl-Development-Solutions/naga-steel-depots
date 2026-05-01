@@ -21,6 +21,10 @@ const links = [
     title: "Users",
     href: "/admin/users",
   },
+  {
+    title: "Notifications",
+    href: "/admin/notifications",
+  },
 ];
 
 const MainNav = ({
@@ -38,7 +42,7 @@ const MainNav = ({
           key={item.href}
           href={item.href}
           className={cn(
-            "tet-sm font-medium transition-color hover:text-primary",
+            "text-sm font-medium transition-color hover:text-primary",
             pathName.includes(item.href) ? "" : "text-muted-foreground",
           )}
         >

@@ -9,9 +9,12 @@ import type { NextAuthConfig } from "next-auth";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
+import { ShippingAddress } from "./types";
 
 export const config = {
-  secret: process.env.NEXTAUTH_SECRET || 'development-secret-key-change-in-production',
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    "development-secret-key-change-in-production",
   pages: {
     signIn: "/sign-in",
     error: "/sign-in",
@@ -64,15 +67,15 @@ export const config = {
   callbacks: {
     ...authConfig.callbacks,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async session({ session, user, trigger, token }: any) {
+    async session({ session, token, trigger, newSession }: any) {
       //Set the user ID  from the token
       session.user.id = token.sub;
       session.user.role = token.role;
       session.user.name = token.name;
 
-      //If there is an update, set the user name
-      if (trigger === "update") {
-        session.user.name = user.name;
+      //If there is an update, set the user name from the new session
+      if (trigger === "update" && newSession?.user?.name) {
+        session.user.name = newSession.user.name;
       }
 
       return session;
@@ -84,6 +87,7 @@ export const config = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.name = user.name;
 
         // If user has no name then use the email
         if (user.name === "NO_NAME") {
@@ -120,6 +124,11 @@ export const config = {
             }
           }
         }
+      }
+
+      // Handle session update trigger - update token name from the session
+      if (trigger === "update" && session?.user?.name) {
+        token.name = session.user.name;
       }
 
       return token;

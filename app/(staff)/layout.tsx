@@ -5,6 +5,8 @@ import Menu from "@/components/shared/header/menu";
 import { Input } from "@/components/ui/input";
 import StaffNav from "./main.nav";
 import { auth } from "@/auth";
+import { getUserNotifications } from "@/lib/actions/notification.actions";
+import StaffSearch from "@/components/staff/staff-search";
 
 export default async function StaffLayout({
   children,
@@ -12,13 +14,13 @@ export default async function StaffLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const notifications = await getUserNotifications(session?.user?.id as string);
 
-  console.log(session);
   return (
     <>
       <div className="border-b container mx-auto">
         <div className="flex items-center h-16 px-4">
-          <Link href="/" className="w-22">
+          <Link href="/staff/dashboard" className="w-22">
             <Image
               src="/images/naga-steel-depot.png"
               alt={`${APP_NAME} logo`}
@@ -30,12 +32,8 @@ export default async function StaffLayout({
 
           <StaffNav className="mx-6" />
           <div className="ml-auto items-center flex space-x-4">
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="md:w-[100px] lg:w-[300px]"
-            />
-            <Menu session={session} />
+            <StaffSearch />
+            <Menu session={session} notifications={notifications} />
           </div>
         </div>
       </div>

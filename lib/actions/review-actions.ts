@@ -144,6 +144,8 @@ export async function hasUserPurchasedProduct({
   productId: string;
   userId: string;
 }) {
+  if (!userId) return false;
+
   const purchasedOrder = await prisma.order.findFirst({
     where: {
       userId: userId,

@@ -42,15 +42,12 @@ const ProfileFormPage = () => {
       return toast.error(res.message);
     }
 
-    const newSession = {
-      ...session,
+    await update({
       user: {
         ...session?.user,
         name: values.name,
       },
-    };
-
-    await update(newSession);
+    });
 
     toast.success(res.message);
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { CartItem } from "@/types";
+import { CartItem, ShippingAddress } from "@/types";
 import { cookies } from "next/headers";
 import { convertToPlainObject, formatError, round2 } from "../utils";
 import { auth } from "@/auth";
@@ -8,16 +8,23 @@ import { prisma } from "@/db/prisma";
 import { cartItemSchema, insertCartSchema } from "@/lib/validator";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma/browser";
+import { getUserById } from "./user.actions";
 
-//calculate art prices
-const calcPrice = (items: CartItem[]) => {
+const normalize = (text: string) => text.toLowerCase().replace(/[-\s]/g, "");
+
+// calculate cart prices
+const calcPrice = (items: CartItem[], city: string) => {
   const itemsPrice = round2(
-      items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
-    ),
-    //Shipping Price
-    shippingPrice = round2(itemsPrice > 100 ? 0 : 10),
-    taxPrice = round2(0.15 * itemsPrice),
-    totalPrice = round2(itemsPrice + taxPrice + shippingPrice);
+    items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
+  );
+
+  const inside = normalize(city).includes("lapulapu");
+
+  const shippingPrice = round2(inside ? 0 : 500);
+
+  const taxPrice = 0;
+
+  const totalPrice = round2(itemsPrice + taxPrice + shippingPrice);
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
@@ -38,6 +45,11 @@ export async function addItemToCart(data: CartItem) {
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
+    const userData = await getUserById(userId as string);
+    const userAddress = (userData.address as ShippingAddress).city;
+
+    console.log(userAddress);
+
     //get cart
     const cart = await getMyCart();
 
@@ -57,7 +69,7 @@ export async function addItemToCart(data: CartItem) {
         userId: userId,
         items: [item],
         sessionCartId: sessionCartId,
-        ...calcPrice([item]),
+        ...calcPrice([item], userAddress),
       });
 
       //add to database
@@ -101,7 +113,7 @@ export async function addItemToCart(data: CartItem) {
         where: { id: cart.id },
         data: {
           items: cart.items as Prisma.CartUpdateitemsInput[],
-          ...calcPrice(cart.items as CartItem[]),
+          ...calcPrice(cart.items as CartItem[], userAddress),
         },
       });
 
@@ -131,6 +143,13 @@ export async function getMyCart() {
   const session = await auth();
   const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
+  const userData = await getUserById(userId as string);
+  const userAddress = (userData.address as ShippingAddress).city;
+
+  const inside = normalize(userAddress).includes("lapulapu");
+
+  const shippingPrice = round2(inside ? 0 : 500);
+
   //get user cart from database
   const cart = await prisma.cart.findFirst({
     where: userId ? { userId: userId } : { sessionCartId: sessionCartId },
@@ -138,13 +157,20 @@ export async function getMyCart() {
 
   if (!cart) return undefined;
 
+  //custom total price
+  const totalPriceOrder = inside
+    ? cart.totalPrice.toString()
+    : Number(cart?.itemsPrice) + Number(shippingPrice);
+
+  console.log("total", totalPriceOrder);
+
   //convert decimals and return
   return convertToPlainObject({
     ...cart,
     items: cart.items as CartItem[],
     itemsPrice: cart.itemsPrice.toString(),
-    totalPrice: cart.totalPrice.toString(),
-    shippingPrice: cart.shippingPrice.toString(),
+    totalPrice: totalPriceOrder.toString(),
+    shippingPrice: shippingPrice.toString(),
     taxPrice: cart.taxPrice.toString(),
   });
 }
@@ -186,12 +212,18 @@ export async function removeItemFromCart(productId: string) {
         exist.qty - 1;
     }
 
+    //get session and user id
+    const session = await auth();
+    const userId = session?.user?.id ? (session.user.id as string) : undefined;
+    const userData = await getUserById(userId as string);
+    const userAddress = (userData.address as ShippingAddress).city;
+
     //update cart in database
     await prisma.cart.update({
       where: { id: cart.id },
       data: {
         items: cart.items as Prisma.CartUpdateitemsInput[],
-        ...calcPrice(cart.items as CartItem[]),
+        ...calcPrice(cart.items as CartItem[], userAddress),
       },
     });
 

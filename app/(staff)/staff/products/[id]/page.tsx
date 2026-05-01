@@ -21,7 +21,7 @@ export async function generateMetadata(props: {
   };
 }
 
-const AdminProductUpdatePage = async (props: {
+const StaffProductUpdatePage = async (props: {
   params: Promise<{
     id: string;
   }>;
@@ -31,11 +31,12 @@ const AdminProductUpdatePage = async (props: {
   if (!id) return notFound();
 
   const res = await getProductById(id);
-  const session = await auth();
 
   if (!res.success) {
     return notFound();
   }
+
+  const session = await auth();
 
   return (
     <div className="space-y-8 mx-auto">
@@ -50,4 +51,4 @@ const AdminProductUpdatePage = async (props: {
   );
 };
 
-export default AdminProductUpdatePage;
+export default StaffProductUpdatePage;

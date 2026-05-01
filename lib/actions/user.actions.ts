@@ -18,7 +18,7 @@ import { ShippingAddress, User } from "@/types";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
-import { getMyCart } from "./cart.actions";
+import { cookies } from "next/headers";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -61,17 +61,32 @@ export async function signInWithCredentials(
 
 // Sign user out
 export async function signOutUser() {
-  const session = await auth();
-  const isAdmin = session?.user?.role === "admin";
-  const isStaff = session?.user.role === "staff";
+  try {
+    const session = await auth();
 
-  const currentCart = await getMyCart();
-  await prisma.cart.delete({ where: { id: currentCart?.id } });
+    const isAdmin = session?.user?.role === "admin";
+    const isStaff = session?.user?.role === "staff";
 
-  if (isAdmin || isStaff) {
+    // Get cart directly without calling getMyCart() which may fail for users without address
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+    if (sessionCartId && session?.user?.id) {
+      const currentCart = await prisma.cart.findFirst({
+        where: { userId: session.user.id },
+      });
+
+      if (currentCart?.id) {
+        await prisma.cart.delete({ where: { id: currentCart.id } });
+      }
+    }
+
+    // Admin and staff redirect to sign-in page, regular users also redirect
     await signOut({ redirectTo: "/sign-in" });
-  } else {
-    await signOut();
+  } catch (error) {
+    // Re-throw redirect errors to allow the redirect to happen
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    throw error;
   }
 }
 
@@ -436,4 +451,13 @@ export async function updateUserProfile(user: { name: string; email: string }) {
       message: formatError(error),
     };
   }
+}
+
+export async function getUserDriver() {
+  const user = await prisma.user.findMany({
+    where: { role: "driver" },
+    omit: { password: true },
+  });
+
+  return user;
 }
