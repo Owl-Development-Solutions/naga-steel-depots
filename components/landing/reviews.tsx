@@ -25,7 +25,7 @@ const reviews = [
   },
 ];
 
-const StarRating = ({ rating }: { rating: number }) => {
+export const StarRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex space-x-1">
       {[...Array(5)].map((_, i) => (

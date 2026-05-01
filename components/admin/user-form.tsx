@@ -86,7 +86,7 @@ const UserAdminForm = ({
           "user",
         email: values.email,
         role: values.role,
-        phoneNumber: values.address?.phoneNumber ?? "",
+        // phoneNumber: values?.address?.phoneNumber ?? "",
         address: values.address,
       });
 
@@ -103,7 +103,7 @@ const UserAdminForm = ({
   const image = form.watch("image");
 
   const onError = (errors: any) => {
-    console.log("FORM ERRORS:", errors);
+    console.error("FORM ERRORS:", errors);
   };
 
   return (
@@ -168,6 +168,7 @@ const UserAdminForm = ({
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel>Phone Number</FieldLabel>
                   <Input
+                    type="number"
                     {...field}
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter user phone number"

@@ -78,6 +78,8 @@ export const productDefaultValues = {
   numReviews: "0",
   isFeatured: false,
   banner: null,
+  lowStockThreshold: 10,
+  isFlagged: false,
 };
 
 export const userCreateDefaultValues: CreateUserInput = {

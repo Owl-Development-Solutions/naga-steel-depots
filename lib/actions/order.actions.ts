@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma/client";
 import { PAGE_SIZE } from "../constants";
 import { sendPurchaseReceipt } from "@/emails";
+import { createOrderPlacedNotification } from "./notification.actions";
 
 //create order and create the order items
 export async function createOrder() {
@@ -94,6 +95,14 @@ export async function createOrder() {
     });
 
     if (!insertedOrderId) throw new Error("Order not created");
+
+    // Create notifications for staff and admin
+    await createOrderPlacedNotification({
+      orderId: insertedOrderId,
+      orderTotal: Number(cart.totalPrice),
+      customerName: user.name || "Customer",
+      placedByUserId: userId,
+    });
 
     return {
       success: true,

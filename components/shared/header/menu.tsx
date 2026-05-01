@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import ModeToggle from "./mode-toggle";
 import Link from "next/link";
-import { EllipsisVertical, ShoppingCart } from "lucide-react";
+import { Bell, EllipsisVertical, ShoppingCart } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -11,17 +11,36 @@ import {
 } from "@/components/ui/sheet";
 import UserButton from "./user-button";
 import { Session } from "next-auth";
+import NotificationBell from "./notification-bell";
 
-const Menu = ({ session }: { session: Session | null }) => {
+const Menu = ({
+  session,
+  notifications,
+}: {
+  session: Session | null;
+  notifications?: any;
+}) => {
+  const isRestricted =
+    session?.user?.role === "admin" || session?.user?.role === "staff";
+
+  console.log(isRestricted);
+
   return (
     <div className="flex justify-end gap-3">
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         <ModeToggle />
-        <Button asChild variant="ghost">
-          <Link href="/cart">
-            <ShoppingCart /> Cart
-          </Link>
-        </Button>
+        {!isRestricted && (
+          <Button asChild variant="ghost">
+            <Link href="/cart">
+              <ShoppingCart />
+              Cart
+            </Link>
+          </Button>
+        )}
+
+        {isRestricted && (
+          <NotificationBell session={session} notifications={notifications} />
+        )}
 
         <UserButton session={session} />
       </nav>
@@ -34,13 +53,14 @@ const Menu = ({ session }: { session: Session | null }) => {
           <SheetContent className="flex flex-col items-start p-6">
             <SheetTitle>Menu</SheetTitle>
             <ModeToggle />
-            <Button asChild variant="ghost">
-              <Link href="/cart">
-                <ShoppingCart />
-                Cart
-              </Link>
-            </Button>
-
+            {!isRestricted && (
+              <Button asChild variant="ghost">
+                <Link href="/cart">
+                  <ShoppingCart />
+                  Cart
+                </Link>
+              </Button>
+            )}
             <UserButton session={session} />
             <SheetDescription></SheetDescription>
           </SheetContent>

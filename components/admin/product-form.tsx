@@ -32,10 +32,12 @@ const ProductForm = ({
   type,
   product,
   productId,
+  role,
 }: {
   type: "Create" | "Update";
   product?: Product;
   productId?: string;
+  role: string;
 }) => {
   const router = useRouter();
 
@@ -57,13 +59,21 @@ const ProductForm = ({
       } else {
         toast.success(res.message);
       }
-      router.push("/admin/products");
+      if (role === "admin") {
+        router.push("/admin/products");
+      } else {
+        router.push("/staff/products");
+      }
     }
 
     //on update
     if (type === "Update") {
       if (!productId) {
-        router.push("/admin/products");
+        if (role === "admin") {
+          router.push("/admin/products");
+        } else {
+          router.push("/staff/products");
+        }
         return;
       }
 
@@ -74,7 +84,11 @@ const ProductForm = ({
       } else {
         toast.success(res.message);
       }
-      router.push("/admin/products");
+      if (role === "admin") {
+        router.push("/admin/products");
+      } else {
+        router.push("/staff/products");
+      }
     }
   };
 
@@ -85,7 +99,9 @@ const ProductForm = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center mb-9">
-        <Link href="/admin/products">
+        <Link
+          href={`${role === "admin" ? "/admin/products" : "/staff/products"}`}
+        >
           <Button variant="outline" size="sm" className="cursor-pointer">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Products
@@ -276,6 +292,79 @@ const ProductForm = ({
                     {...field}
                     aria-invalid={fieldState.invalid}
                   />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-5">
+            {/* Low Stock Threshold */}
+            <Controller
+              name="lowStockThreshold"
+              control={form.control}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: ControllerRenderProps<
+                  z.infer<typeof insertProductSchema>,
+                  "lowStockThreshold"
+                >;
+                fieldState: ControllerFieldState;
+              }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Low Stock Threshold</FieldLabel>
+                  <Input
+                    type="number"
+                    placeholder="Enter low stock threshold (e.g., 10)"
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Alert when stock falls to or below this level
+                  </p>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            {/* Is Flagged */}
+            <Controller
+              name="isFlagged"
+              control={form.control}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: ControllerRenderProps<
+                  z.infer<typeof insertProductSchema>,
+                  "isFlagged"
+                >;
+                fieldState: ControllerFieldState;
+              }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Flag for Restock</FieldLabel>
+                  <div className="flex items-center space-x-2 border rounded-md p-3">
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      id="isFlagged"
+                    />
+                    <label
+                      htmlFor="isFlagged"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Flag this product for restock notification
+                    </label>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Flagged products appear in admin or staff notifications
+                  </p>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

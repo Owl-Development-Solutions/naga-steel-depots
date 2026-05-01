@@ -32,6 +32,12 @@ export const insertProductSchema = z.object({
   isFeatured: z.boolean(),
   banner: z.string().nullable(),
   price: currency,
+  lowStockThreshold: z.coerce
+    .number()
+    .int()
+    .positive("Threshold must be positive")
+    .default(10),
+  isFlagged: z.boolean().default(false),
 });
 
 //schema for updating products
@@ -165,7 +171,7 @@ export const updateUserSchema = z.object({
   email: z.email("Invalid email address"),
   role: z.string().min(1, "Role is required"),
   image: z.string().optional(),
-  phoneNumber: zPhone.optional(),
+  // phoneNumber: zPhone.optional(),
   address: shippingAddressSchema.optional(),
 });
 
@@ -181,4 +187,9 @@ export const insertReviewSchema = z.object({
     .min(1, "Rating must be at least 1")
     .max(5, "Rating must be at most 5"),
   updatedAt: z.date(),
+});
+
+//schema to insert a delivery driver
+export const insertDeliveryDriver = z.object({
+  driver: z.string().min(3, "Driver is required"),
 });

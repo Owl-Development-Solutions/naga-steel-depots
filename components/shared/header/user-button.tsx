@@ -85,8 +85,8 @@ const UserButton = ({ session }: { session: any }) => {
 
           {session?.user?.role === "staff" && (
             <DropdownMenuItem>
-              <Link href="/staff/dashboard" className="w-full">
-                Staff
+              <Link href="/staff/profile" className="w-full">
+                Profile
               </Link>
             </DropdownMenuItem>
           )}

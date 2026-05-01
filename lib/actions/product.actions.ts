@@ -7,6 +7,8 @@ import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import z from "zod";
 import { insertProductSchema, updateProductSchema } from "../validator";
+import { auth } from "@/auth";
+import { createProductUpdateNotification } from "./notification.actions";
 
 //Get latest products
 export const getLatestProducts = async () => {
@@ -233,8 +235,20 @@ export async function deleteProduct(id: string) {
 export async function createProduct(data: z.infer<typeof insertProductSchema>) {
   try {
     const product = insertProductSchema.parse(data);
+    const session = await auth();
+    const userId = session?.user?.id;
 
-    await prisma.product.create({ data: product });
+    const createdProduct = await prisma.product.create({ data: product });
+
+    // Create notification for other staff members
+    if (userId) {
+      await createProductUpdateNotification({
+        productId: createdProduct.id,
+        productName: createdProduct.name,
+        action: "created",
+        updatedByUserId: userId,
+      });
+    }
 
     revalidatePath("/admin/products");
 
@@ -251,6 +265,8 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
 export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
   try {
     const product = updateProductSchema.parse(data);
+    const session = await auth();
+    const userId = session?.user?.id;
 
     const productExists = await prisma.product.findFirst({
       where: { id: product.id },
@@ -258,12 +274,26 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
 
     if (!productExists) throw new Error("Product not found");
 
-    await prisma.product.update({
+    const updatedProduct = await prisma.product.update({
       where: { id: product.id },
       data: product,
     });
 
-    revalidatePath("/admin/products");
+    // Create notification for other staff members
+    if (userId) {
+      await createProductUpdateNotification({
+        productId: updatedProduct.id,
+        productName: updatedProduct.name,
+        action: "updated",
+        updatedByUserId: userId,
+      });
+    }
+
+    if (session?.user?.role === "admin") {
+      revalidatePath("/admin/products");
+    } else {
+      revalidatePath("/staff/products");
+    }
 
     return {
       success: true,
