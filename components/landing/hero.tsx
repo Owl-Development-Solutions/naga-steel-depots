@@ -76,7 +76,7 @@ const HeroLanding = () => {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-4">
+            {/* <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => scrollTo("#products")}
                 className="group relative px-6 py-3 rounded  text-sm font-semibold text-[#060c12] overflow-hidden cursor-pointer"
@@ -94,7 +94,7 @@ const HeroLanding = () => {
               >
                 Request a Quote
               </button>
-            </div>
+            </div> */}
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 pt-4 border-t border-gray-200 dark:border-[#1e2d3d]">

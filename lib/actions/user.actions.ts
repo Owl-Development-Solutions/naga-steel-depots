@@ -459,5 +459,5 @@ export async function getUserDriver() {
     omit: { password: true },
   });
 
-  return user;
+  return convertToPlainObject(user);
 }
