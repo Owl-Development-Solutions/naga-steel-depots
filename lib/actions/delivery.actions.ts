@@ -65,10 +65,16 @@ export async function updateOrderStatusAndDriver({
   orderId,
   driverId,
   status,
+  trackingNumber,
+  carrier,
+  notes,
 }: {
   orderId: string;
   driverId?: string;
   status?: string;
+  trackingNumber?: string;
+  carrier?: string;
+  notes?: string;
 }) {
   try {
     const order = await prisma.order.findUnique({
@@ -78,15 +84,20 @@ export async function updateOrderStatusAndDriver({
     if (!order) throw new Error("Order not found");
 
     const updateData: {
-      deliveryDriver?: string;
-      driverPhone?: string;
+      deliveryDriver?: string | null;
+      driverPhone?: string | null;
       status?: string;
       estimatedDelivery?: Date;
       estimatedDeliveryEnd?: Date;
+      trackingNumber?: string | null;
+      carrier?: string | null;
+      notes?: string | null;
+      deliveredAt?: Date;
+      cancelledAt?: Date;
     } = {};
 
-    // Update driver info if driverId is provided
-    if (driverId) {
+    // Update driver info if driverId is provided and not "none"
+    if (driverId && driverId !== "none") {
       const driver = await getUserById(driverId);
       const address = order.shippingAddress as { city: string };
 
@@ -100,11 +111,39 @@ export async function updateOrderStatusAndDriver({
         updateData.estimatedDelivery = estimatedDeliveryStart;
         updateData.estimatedDeliveryEnd = estimatedDeliveryEnd;
       }
+    } else if (driverId === "none") {
+      // Clear driver assignment if "none" is selected
+      updateData.deliveryDriver = null;
+      updateData.driverPhone = null;
     }
 
     // Update status if provided
     if (status) {
       updateData.status = status;
+      
+      // Auto-update deliveredAt when status is set to delivered
+      if (status === "delivered") {
+        updateData.deliveredAt = new Date();
+      }
+      
+      // Auto-update cancelledAt when status is set to cancelled
+      if (status === "cancelled") {
+        updateData.cancelledAt = new Date();
+      }
+    }
+
+    // Update tracking information
+    if (trackingNumber !== undefined) {
+      updateData.trackingNumber = trackingNumber || null;
+    }
+
+    if (carrier !== undefined) {
+      updateData.carrier = carrier || null;
+    }
+
+    // Update notes
+    if (notes !== undefined) {
+      updateData.notes = notes || null;
     }
 
     await prisma.order.update({
@@ -113,8 +152,9 @@ export async function updateOrderStatusAndDriver({
     });
 
     revalidatePath("/staff/orders");
+    revalidatePath(`/staff/orders/${orderId}`);
 
-    return { success: true, message: "Order has been updated" };
+    return { success: true, message: "Order has been updated successfully" };
   } catch (error) {
     return {
       success: false,

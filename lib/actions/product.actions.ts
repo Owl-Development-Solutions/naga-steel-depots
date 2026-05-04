@@ -199,7 +199,7 @@ export async function getAllProducts({
   const dataCount = await prisma.product.count();
 
   return {
-    data,
+    data: convertToPlainObject(data),
     totalPage: Math.ceil(dataCount / limit),
   };
 }
