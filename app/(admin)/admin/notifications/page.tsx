@@ -26,8 +26,11 @@ import ProductDetails from "@/components/product-details";
 import { getProductById } from "@/lib/actions/product.actions";
 import {
   deleteNotification,
+  getUserNotifications,
   markAllNotificationsAsRead,
 } from "@/lib/actions/notification.actions";
+import { requireAdmin } from "@/lib/auth-guard";
+import OrderDetails from "@/components/order-details";
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
@@ -79,22 +82,23 @@ const getNotificationTitle = (type: string) => {
 };
 
 export default async function NotificationsPage() {
+  await requireAdmin();
+
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/sign-in");
   }
 
+  if (session?.user.role === " admin")
+    throw new Error("User is not authorized");
+
   // Fetch notifications from database
-  const notifications = await prisma.notification.findMany({
-    where: { userId: session.user.id },
-    orderBy: [{ createdAt: "desc" }],
-    take: 100,
-  });
+  const notifications = await getUserNotifications(session.user.id);
 
-  console.log(notifications);
+  // console.log(notifications);
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.data?.filter((n) => !n.isRead).length;
 
   return (
     <div className="space-y-6">
@@ -113,102 +117,114 @@ export default async function NotificationsPage() {
         </form>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          {notifications.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <Bell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p>No notifications yet</p>
-            </div>
-          ) : (
-            <div className="divide-y">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-4 flex items-start gap-4 ${
-                    !notification.isRead
-                      ? getNotificationColor(notification.type)
-                      : "bg-white"
-                  } border-b last:border-b-0 transition-colors`}
-                >
-                  <div className="flex-shrink-0 mt-1">
-                    {getNotificationIcon(notification.type)}
-                  </div>
+      <div className="divide-y flex flex-col gap-4">
+        {notifications?.data?.map((notification) => (
+          <Card
+            key={notification.id}
+            className={`transition-colors ${
+              !notification.isRead
+                ? getNotificationColor(notification.type)
+                : "bg-white"
+            }`}
+          >
+            <CardContent className="p-4 flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                {getNotificationIcon(notification.type)}
+              </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h3 className="font-medium">
-                        {notification.title ||
-                          getNotificationTitle(notification.type)}
-                      </h3>
-                      {!notification.isRead && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-blue-100 text-blue-800 text-xs"
-                        >
-                          New
-                        </Badge>
-                      )}
-                      <Badge variant="outline" className="text-xs">
-                        {notification.type.replace(/_/g, " ")}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-1">
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {formatDistanceToNow(new Date(notification.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </p>
-                  </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h3 className="font-medium">
+                    {notification.title ||
+                      getNotificationTitle(notification.type)}
+                  </h3>
 
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {notification.link && (
-                      // <Button variant="outline" size="sm" asChild>
-                      //   <a href={notification.link}>View</a>
-                      // </Button>
+                  {!notification.isRead && (
+                    <Badge className="bg-blue-100 text-blue-800 text-xs">
+                      New
+                    </Badge>
+                  )}
 
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                        </DialogTrigger>
-
-                        <DialogContent className="max-w-lg">
-                          <DialogHeader>
-                            <DialogTitle>Product Details</DialogTitle>
-                          </DialogHeader>
-
-                          <ProductDetails
-                            productId={
-                              (notification.metadata as { productId: string })
-                                ?.productId
-                            }
-                          />
-                        </DialogContent>
-                      </Dialog>
-                    )}
-                    <form
-                      action={deleteNotification.bind(null, notification.id)}
-                    >
-                      <Button
-                        type="submit"
-                        variant="ghost"
-                        size="sm"
-                        className="text-gray-400 hover:text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </form>
-                  </div>
+                  <Badge variant="outline" className="text-xs bg-amber-300">
+                    {notification.type.replace(/_/g, " ")}
+                  </Badge>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+                <p className="text-sm text-gray-600 mb-1">
+                  {notification.message}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  {formatDistanceToNow(new Date(notification.createdAt), {
+                    addSuffix: true,
+                  })}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {notification.link &&
+                  ((notification.metadata as { productId?: string })
+                    ?.productId ? (
+                    // ✅ CASE 1: Has productId → use Dialog
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          View
+                        </Button>
+                      </DialogTrigger>
+
+                      <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle>Product Details</DialogTitle>
+                        </DialogHeader>
+
+                        <ProductDetails
+                          productId={
+                            (notification.metadata as { productId: string })
+                              .productId
+                          }
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  ) : (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          View
+                        </Button>
+                      </DialogTrigger>
+
+                      <DialogContent className="!max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Order Details</DialogTitle>
+                        </DialogHeader>
+
+                        <OrderDetails
+                          orderId={
+                            (notification.metadata as { orderId: string })
+                              .orderId
+                          }
+                          type="readonly"
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  ))}
+
+                <form action={deleteNotification.bind(null, notification.id)}>
+                  <Button
+                    type="submit"
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-400 hover:text-red-600"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </form>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

@@ -3,9 +3,9 @@ import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
 import MainNav from "./main.nav";
 import Menu from "@/components/shared/header/menu";
-import { Input } from "@/components/ui/input";
 import AdminSearch from "@/components/admin/admin-search";
 import { auth } from "@/auth";
+import { getUserNotifications } from "@/lib/actions/notification.actions";
 
 export default async function AdminLayout({
   children,
@@ -13,6 +13,8 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+
+  const notifications = await getUserNotifications(session?.user?.id as string);
 
   return (
     <>
@@ -31,7 +33,7 @@ export default async function AdminLayout({
           <MainNav className="mx-6" />
           <div className="ml-auto items-center flex space-x-4">
             <AdminSearch />
-            <Menu session={session} />
+            <Menu session={session} notifications={notifications} />
           </div>
         </div>
       </div>

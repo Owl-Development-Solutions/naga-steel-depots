@@ -56,7 +56,7 @@ export default async function OrdersPage(props: {
           {searchText && (
             <div>
               Filtered by <i>&quot;{searchText}&quot;</i>
-              <Link href="/admin/products">
+              <Link href="/admin/orders">
                 <Button
                   variant="destructive"
                   size="sm"
@@ -137,7 +137,7 @@ export default async function OrdersPage(props: {
         </TableBody>
       </Table>
 
-      {orders.totalPages > 1 && (
+      {orders.totalPages > 1 && orders.data.length > 0 && (
         <Pagination page={Number(page) || 1} totalPages={orders?.totalPages} />
       )}
     </div>

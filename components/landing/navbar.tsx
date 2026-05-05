@@ -82,7 +82,7 @@ const NavBarLanding = () => {
                 )}
               </li>
             ))}
-            <ModeToggle />
+            {/* <ModeToggle /> */}
           </ul>
 
           {/* CTA */}
@@ -100,7 +100,7 @@ const NavBarLanding = () => {
               </SheetTrigger>
               <SheetContent className="flex flex-col items-start p-6">
                 <SheetTitle>Menu</SheetTitle>
-                <ModeToggle />
+                {/* <ModeToggle /> */}
                 <ul className="flex flex-col gap-4">
                   {navLinks.map((link) => (
                     <li key={link.href}>

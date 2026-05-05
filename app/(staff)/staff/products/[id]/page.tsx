@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import ProductForm from "@/components/admin/product-form";
 import { getProductById } from "@/lib/actions/product.actions";
+import { requireStaff } from "@/lib/auth-guard";
 import { Product } from "@/types";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -8,6 +9,7 @@ import { notFound } from "next/navigation";
 export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  await requireStaff();
   const { id } = await props.params;
 
   if (!id) throw new Error("Product not found");

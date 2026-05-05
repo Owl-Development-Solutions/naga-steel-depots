@@ -29,6 +29,7 @@ import {
 } from "@/lib/actions/notification.actions";
 import Link from "next/link";
 import OrderDetails from "@/components/order-details";
+import { requireStaff } from "@/lib/auth-guard";
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
@@ -80,6 +81,7 @@ const getNotificationTitle = (type: string) => {
 };
 
 export default async function NotificationsPage() {
+  await requireStaff();
   const session = await auth();
 
   if (!session?.user?.id) {

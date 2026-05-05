@@ -8,6 +8,7 @@ import { Metadata } from "next";
 import { getAllProducts, getProductById } from "@/lib/actions/product.actions";
 import { formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
 import Link from "next/link";
+import { requireStaff } from "@/lib/auth-guard";
 
 export const metadata: Metadata = {
   title: "Staff Products",
@@ -43,6 +44,7 @@ export default async function ProductsUI(props: {
     category: string;
   }>;
 }) {
+  await requireStaff();
   const searchParams = await props.searchParams;
 
   const page = Number(searchParams.page) || 1;

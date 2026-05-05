@@ -1,5 +1,6 @@
 import UserAdminForm from "@/components/admin/user-form";
 import { getUserByIdByProps } from "@/lib/actions/user.actions";
+import { requireAdmin } from "@/lib/auth-guard";
 import { User } from "@/types";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -25,6 +26,7 @@ const CreateUser = async (props: {
     id: string;
   }>;
 }) => {
+  await requireAdmin();
   const { id } = await props.params;
 
   console.log(id);
