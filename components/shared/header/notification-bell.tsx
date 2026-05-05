@@ -21,6 +21,9 @@ const NotificationBell = ({
   notifications: any;
 }) => {
   const unreadCount = notifications?.data?.filter((n: any) => !n.isRead).length;
+
+  console.log("unreadCount", unreadCount);
+
   return (
     <div className="flex gap-2 items-center">
       <DropdownMenu>

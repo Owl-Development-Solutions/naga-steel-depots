@@ -25,10 +25,12 @@ const Menu = ({
 
   console.log(isRestricted);
 
+  console.log(notifications);
+
   return (
     <div className="flex justify-end gap-3">
       <nav className="hidden md:flex w-full max-w-xs gap-1">
-        <ModeToggle />
+        {/* <ModeToggle /> */}
         {!isRestricted && (
           <Button asChild variant="ghost">
             <Link href="/cart">
@@ -52,7 +54,7 @@ const Menu = ({
           </SheetTrigger>
           <SheetContent className="flex flex-col items-start p-6">
             <SheetTitle>Menu</SheetTitle>
-            <ModeToggle />
+            {/* <ModeToggle /> */}
             {!isRestricted && (
               <Button asChild variant="ghost">
                 <Link href="/cart">
