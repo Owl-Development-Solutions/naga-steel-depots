@@ -3,6 +3,7 @@ import { Metadata } from "next";
 
 import { SessionProvider } from "next-auth/react";
 import ProfileFormPage from "./staff-profile-form";
+import { requireStaff } from "@/lib/auth-guard";
 
 export async function generateMetadata(): Promise<Metadata> {
   const session = await auth();
@@ -13,6 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const StaffProfilePage = async () => {
+  await requireStaff();
   const session = await auth();
 
   return (
