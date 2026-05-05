@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import ModeToggle from "./mode-toggle";
 import Link from "next/link";
-import { Bell, EllipsisVertical, ShoppingCart } from "lucide-react";
+import { Bell, EllipsisVertical } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -12,6 +12,7 @@ import {
 import UserButton from "./user-button";
 import { Session } from "next-auth";
 import NotificationBell from "./notification-bell";
+import CartButton from "./cart-button";
 
 const Menu = ({
   session,
@@ -31,14 +32,7 @@ const Menu = ({
     <div className="flex justify-end gap-3">
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         {/* <ModeToggle /> */}
-        {!isRestricted && (
-          <Button asChild variant="ghost">
-            <Link href="/cart">
-              <ShoppingCart />
-              Cart
-            </Link>
-          </Button>
-        )}
+        {!isRestricted && <CartButton />}
 
         {isRestricted && (
           <NotificationBell session={session} notifications={notifications} />
@@ -55,14 +49,7 @@ const Menu = ({
           <SheetContent className="flex flex-col items-start p-6">
             <SheetTitle>Menu</SheetTitle>
             {/* <ModeToggle /> */}
-            {!isRestricted && (
-              <Button asChild variant="ghost">
-                <Link href="/cart">
-                  <ShoppingCart />
-                  Cart
-                </Link>
-              </Button>
-            )}
+            {!isRestricted && <CartButton />}
             <UserButton session={session} />
             <SheetDescription></SheetDescription>
           </SheetContent>
