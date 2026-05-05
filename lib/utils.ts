@@ -1,4 +1,6 @@
+import { CartItem } from "@/types";
 import { clsx, type ClassValue } from "clsx";
+import { normalize } from "path";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
 
@@ -133,4 +135,26 @@ export const getTitleBasedOnTime = () => {
   } else {
     return "Good Evening";
   }
+};
+
+// calculate cart prices
+export const calcPrice = (items: CartItem[], city: string) => {
+  const itemsPrice = round2(
+    items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
+  );
+
+  const inside = normalize(city).includes("lapulapu");
+
+  const shippingPrice = round2(inside ? 0 : 500);
+
+  const taxPrice = 0;
+
+  const totalPrice = round2(itemsPrice + taxPrice + shippingPrice);
+
+  return {
+    itemsPrice: itemsPrice.toFixed(2),
+    shippingPrice: shippingPrice.toFixed(2),
+    taxPrice: taxPrice.toFixed(2),
+    totalPrice: totalPrice.toFixed(2),
+  };
 };

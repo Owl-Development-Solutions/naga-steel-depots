@@ -6,7 +6,12 @@ import { getUserById } from "./user.actions";
 import { insertOrderSchema } from "../validator";
 import { prisma } from "@/db/prisma";
 import { CartItem, PaymentResult, ShippingAddress } from "@/types";
-import { convertToPlainObject, formatError, formatNumber } from "../utils";
+import {
+  calcPrice,
+  convertToPlainObject,
+  formatError,
+  formatNumber,
+} from "../utils";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
@@ -16,6 +21,108 @@ import { sendPurchaseReceipt } from "@/emails";
 import { createOrderPlacedNotification } from "./notification.actions";
 
 //create order and create the order items
+// export async function createOrder() {
+//   try {
+//     const session = await auth();
+//     if (!session) throw new Error("User is not authenticated");
+
+//     const cart = await getMyCart();
+//     const userId = session?.user?.id;
+
+//     if (!userId) throw new Error("User not found");
+
+//     const user = await getUserById(userId);
+
+//     if (!cart || cart.items.length === 0) {
+//       return {
+//         success: false,
+//         message: "Your cart is empty",
+//         redirectTo: "/cart",
+//       };
+//     }
+
+//     if (!user.address) {
+//       return {
+//         success: false,
+//         message: "No Shipping Address",
+//         redirectTo: "/shipping-address",
+//       };
+//     }
+
+//     if (!user.paymentMethod) {
+//       return {
+//         success: false,
+//         message: "No payment method",
+//         redirectTo: "/payment-method",
+//       };
+//     }
+
+//     //create order object
+//     const order = insertOrderSchema.parse({
+//       userId: user.id,
+//       shippingAddress: user.address,
+//       paymentMethod: user.paymentMethod,
+//       itemsPrice: cart.itemsPrice,
+//       shippingPrice: cart.shippingPrice,
+//       taxPrice: cart.taxPrice,
+//       totalPrice: cart.totalPrice,
+//     });
+
+//     //create a transaction to create order and order items in database
+//     const insertedOrderId = await prisma.$transaction(async (tx) => {
+//       //create order
+//       const insertedOrder = await tx.order.create({ data: order });
+
+//       //create order items from the cart items
+//       for (const item of cart.items as CartItem[]) {
+//         await tx.orderItem.create({
+//           data: {
+//             ...item,
+//             price: item.price,
+//             orderId: insertedOrder.id,
+//           },
+//         });
+//       }
+
+//       //clear the cart
+//       await tx.cart.update({
+//         where: { id: cart.id },
+//         data: {
+//           items: [],
+//           totalPrice: 0,
+//           taxPrice: 0,
+//           shippingPrice: 0,
+//           itemsPrice: 0,
+//         },
+//       });
+
+//       return insertedOrder.id;
+//     });
+
+//     if (!insertedOrderId) throw new Error("Order not created");
+
+//     // Create notifications for staff and admin
+//     await createOrderPlacedNotification({
+//       orderId: insertedOrderId,
+//       orderTotal: Number(cart.totalPrice),
+//       customerName: user.name || "Customer",
+//       placedByUserId: userId,
+//     });
+
+//     return {
+//       success: true,
+//       message: "Order created",
+//       redirectTo: `/order/${insertedOrderId}`,
+//     };
+//   } catch (error) {
+//     if (isRedirectError(error)) throw error;
+
+//     return {
+//       success: false,
+//       message: formatError(error),
+//     };
+//   }
+// }
 export async function createOrder() {
   try {
     const session = await auth();
@@ -52,24 +159,43 @@ export async function createOrder() {
       };
     }
 
-    //create order object
+    // Filter only selected items
+    const selectedSet = new Set(cart.itemSelected);
+    const selectedItems = (cart.items as CartItem[]).filter((item) =>
+      selectedSet.has(item.productId),
+    );
+
+    if (selectedItems.length === 0) {
+      return {
+        success: false,
+        message: "No items selected",
+        redirectTo: "/cart",
+      };
+    }
+
+    // Calculate prices only for selected items
+    const session2 = await auth();
+    const userData = await getUserById(session2?.user?.id as string);
+    const userAddress = (userData.address as ShippingAddress)?.city;
+    const selectedPrices = calcPrice(selectedItems, userAddress);
+
+    // Create order object using selected items prices
     const order = insertOrderSchema.parse({
       userId: user.id,
       shippingAddress: user.address,
       paymentMethod: user.paymentMethod,
-      itemsPrice: cart.itemsPrice,
-      shippingPrice: cart.shippingPrice,
-      taxPrice: cart.taxPrice,
-      totalPrice: cart.totalPrice,
+      itemsPrice: selectedPrices.itemsPrice,
+      shippingPrice: selectedPrices.shippingPrice,
+      taxPrice: selectedPrices.taxPrice,
+      totalPrice: selectedPrices.totalPrice,
     });
 
-    //create a transaction to create order and order items in database
     const insertedOrderId = await prisma.$transaction(async (tx) => {
-      //create order
+      // Create order
       const insertedOrder = await tx.order.create({ data: order });
 
-      //create order items from the cart items
-      for (const item of cart.items as CartItem[]) {
+      // Create order items from SELECTED items only
+      for (const item of selectedItems) {
         await tx.orderItem.create({
           data: {
             ...item,
@@ -79,15 +205,26 @@ export async function createOrder() {
         });
       }
 
-      //clear the cart
+      // Remove only selected items from cart, keep the rest
+      const remainingItems = (cart.items as CartItem[]).filter(
+        (item) => !selectedSet.has(item.productId),
+      );
+
+      // Recalculate prices for remaining items
+      const remainingPrices =
+        remainingItems.length > 0
+          ? calcPrice(remainingItems, userAddress)
+          : { itemsPrice: 0, shippingPrice: 0, taxPrice: 0, totalPrice: 0 };
+
       await tx.cart.update({
         where: { id: cart.id },
         data: {
-          items: [],
-          totalPrice: 0,
-          taxPrice: 0,
-          shippingPrice: 0,
-          itemsPrice: 0,
+          items: remainingItems,
+          itemSelected: [], // Clear selection
+          itemsPrice: remainingPrices.itemsPrice,
+          shippingPrice: remainingPrices.shippingPrice,
+          taxPrice: remainingPrices.taxPrice,
+          totalPrice: remainingPrices.totalPrice,
         },
       });
 
@@ -96,10 +233,9 @@ export async function createOrder() {
 
     if (!insertedOrderId) throw new Error("Order not created");
 
-    // Create notifications for staff and admin
     await createOrderPlacedNotification({
       orderId: insertedOrderId,
-      orderTotal: Number(cart.totalPrice),
+      orderTotal: Number(selectedPrices.totalPrice),
       customerName: user.name || "Customer",
       placedByUserId: userId,
     });
@@ -111,7 +247,6 @@ export async function createOrder() {
     };
   } catch (error) {
     if (isRedirectError(error)) throw error;
-
     return {
       success: false,
       message: formatError(error),

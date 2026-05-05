@@ -19,6 +19,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import PlaceOrderForm from "./place-order-form";
+import { X } from "lucide-react";
+import CancelOrderButton from "./cancel-order";
 
 export const metadata: Metadata = {
   title: "Place Order",
@@ -40,20 +42,29 @@ const PlaceOrderPage = async () => {
 
   const userAddress = user.address as ShippingAddress;
 
+  const itemSelected = cart.itemSelected;
+
+  const selectedSet = new Set(itemSelected);
+
+  const selectedItems = cart.items.filter((item) =>
+    selectedSet.has(item.productId),
+  );
+
   return (
     <>
       <CheckoutSteps current={3} />
       <h1 className="py-4 text-xl">Place Order</h1>
 
       <div className="grid md:grid-cols-3 md:gap-5">
-        <div className="md:col-span-2  space-y-4">
+        <div className="md:col-span-2 space-y-4">
+          {/* Shipping */}
           <Card>
             <CardContent className="p-4 gap-4">
               <h2 className="text-xl pb-4">Shipping Address</h2>
               <p>{userAddress.fullName}</p>
               <p>
                 {userAddress.streetAddress}, {userAddress.city}{" "}
-                {userAddress.postalCode}, {userAddress.country}{" "}
+                {userAddress.postalCode}, {userAddress.country}
               </p>
 
               <div className="mt-3">
@@ -64,6 +75,7 @@ const PlaceOrderPage = async () => {
             </CardContent>
           </Card>
 
+          {/* Payment */}
           <Card>
             <CardContent className="p-4 gap-4">
               <h2 className="text-xl pb-4">Payment Method</h2>
@@ -77,9 +89,11 @@ const PlaceOrderPage = async () => {
             </CardContent>
           </Card>
 
+          {/* Items */}
           <Card>
             <CardContent className="p-4 gap-4">
               <h2 className="text-xl pb-4">Order Items</h2>
+
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -88,8 +102,9 @@ const PlaceOrderPage = async () => {
                     <TableHead>Price</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
-                  {cart.items.map((item) => (
+                  {selectedItems.map((item) => (
                     <TableRow key={item.slug}>
                       <TableCell>
                         <Link
@@ -105,15 +120,12 @@ const PlaceOrderPage = async () => {
                           <span className="px-2">{item.name}</span>
                         </Link>
                       </TableCell>
+
                       <TableCell>
                         <span className="px-2">{item.qty}</span>
                       </TableCell>
-                      <TableCell
-                        className="
-                      "
-                      >
-                        ₱{item.price}
-                      </TableCell>
+
+                      <TableCell>₱{item.price}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -122,6 +134,7 @@ const PlaceOrderPage = async () => {
           </Card>
         </div>
 
+        {/* Summary */}
         <div>
           <Card>
             <CardContent className="p-4 gap-4 space-y-4">
@@ -144,7 +157,11 @@ const PlaceOrderPage = async () => {
                 <div>Total</div>
                 <div>{formatCurrency(cart.totalPrice)}</div>
               </div>
-              <PlaceOrderForm />
+
+              <div className="flex flex-col items-center gap-3">
+                <PlaceOrderForm />
+                <CancelOrderButton />
+              </div>
             </CardContent>
           </Card>
         </div>
