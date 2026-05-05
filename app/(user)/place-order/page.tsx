@@ -18,9 +18,10 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import PlaceOrderForm from "./place-order-form";
+
 import { X } from "lucide-react";
 import CancelOrderButton from "./cancel-order";
+import PlaceOrderForm from "./place-order-form";
 
 export const metadata: Metadata = {
   title: "Place Order",

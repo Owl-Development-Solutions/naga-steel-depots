@@ -159,7 +159,6 @@ export async function createOrder() {
       };
     }
 
-    // Filter only selected items
     const selectedSet = new Set(cart.itemSelected);
     const selectedItems = (cart.items as CartItem[]).filter((item) =>
       selectedSet.has(item.productId),
@@ -173,13 +172,11 @@ export async function createOrder() {
       };
     }
 
-    // Calculate prices only for selected items
     const session2 = await auth();
     const userData = await getUserById(session2?.user?.id as string);
     const userAddress = (userData.address as ShippingAddress)?.city;
     const selectedPrices = calcPrice(selectedItems, userAddress);
 
-    // Create order object using selected items prices
     const order = insertOrderSchema.parse({
       userId: user.id,
       shippingAddress: user.address,
@@ -191,10 +188,8 @@ export async function createOrder() {
     });
 
     const insertedOrderId = await prisma.$transaction(async (tx) => {
-      // Create order
       const insertedOrder = await tx.order.create({ data: order });
 
-      // Create order items from SELECTED items only
       for (const item of selectedItems) {
         await tx.orderItem.create({
           data: {
@@ -205,12 +200,10 @@ export async function createOrder() {
         });
       }
 
-      // Remove only selected items from cart, keep the rest
       const remainingItems = (cart.items as CartItem[]).filter(
         (item) => !selectedSet.has(item.productId),
       );
 
-      // Recalculate prices for remaining items
       const remainingPrices =
         remainingItems.length > 0
           ? calcPrice(remainingItems, userAddress)
@@ -220,7 +213,7 @@ export async function createOrder() {
         where: { id: cart.id },
         data: {
           items: remainingItems,
-          itemSelected: [], // Clear selection
+          itemSelected: [],
           itemsPrice: remainingPrices.itemsPrice,
           shippingPrice: remainingPrices.shippingPrice,
           taxPrice: remainingPrices.taxPrice,
