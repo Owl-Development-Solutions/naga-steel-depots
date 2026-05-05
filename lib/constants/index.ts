@@ -41,14 +41,14 @@ export const PAYMENT_METHODS = [
     icon: Wallet,
     color: "text-[#001C64]",
   },
-  {
-    id: "stripe",
-    value: "Stripe",
-    label: "Stripe",
-    description: "Pay using credit or debit card via Stripe",
-    icon: CreditCard,
-    color: "text-[#533AFD]",
-  },
+  // {
+  //   id: "stripe",
+  //   value: "Stripe",
+  //   label: "Stripe",
+  //   description: "Pay using credit or debit card via Stripe",
+  //   icon: CreditCard,
+  //   color: "text-[#533AFD]",
+  // },
   {
     id: "cash_on_delivery",
     value: "CashOnDelivery",
