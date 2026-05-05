@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { getAllUsers } from "@/lib/actions/user.actions";
 import UsersAdminTable from "./users-table";
 import { UserPlus } from "lucide-react";
+import { requireAdmin } from "@/lib/auth-guard";
 
 export default async function UsersPage(props: {
   searchParams: Promise<{
@@ -10,11 +11,10 @@ export default async function UsersPage(props: {
     query: string;
   }>;
 }) {
+  await requireAdmin();
   const { page = "1", query: searchText } = await props.searchParams;
 
   const users = await getAllUsers({ page: Number(page), query: searchText });
-
-  console.log(users);
 
   return (
     <div className="space-y-6">
