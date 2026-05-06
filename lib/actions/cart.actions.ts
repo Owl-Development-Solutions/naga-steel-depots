@@ -242,12 +242,18 @@ export async function setItemQty(productId: string, newQty: number) {
     const product = await prisma.product.findFirst({
       where: { id: productId },
     });
-    if (!product) throw new Error("Product not found");
+    if (!product) {
+      return { success: false, message: "Product not found" };
+    }
 
-    if (product.stock < newQty) throw new Error("Not enough stock");
+    if (product.stock < newQty) {
+      return { success: false, message: "Not enough stock" };
+    }
 
     const cart = await getMyCart();
-    if (!cart) throw new Error("Cart not found");
+    if (!cart) {
+      return { success: false, message: "Cart not found" };
+    }
 
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
@@ -257,7 +263,9 @@ export async function setItemQty(productId: string, newQty: number) {
     const items = cart.items as CartItem[];
     const existItem = items.find((x) => x.productId === productId);
 
-    if (!existItem) throw new Error("Item not found in cart");
+    if (!existItem) {
+      return { success: false, message: "Item not found in the cart" };
+    }
 
     if (newQty <= 0) {
       // Remove item entirely
@@ -278,6 +286,8 @@ export async function setItemQty(productId: string, newQty: number) {
 
     return { success: true, message: `${product.name} quantity updated` };
   } catch (error) {
+    console.log(formatError(error));
+
     return { success: false, message: formatError(error) };
   }
 }

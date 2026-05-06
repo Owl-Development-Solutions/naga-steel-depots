@@ -40,19 +40,31 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
 
   const [removedItems, setRemovedItems] = useState<CartItem[]>([]);
 
+  // useEffect(() => {
+  //   if (cart && cart.items.length > 0) {
+  //     setSelectedItems(new Set(cart.items.map((item) => item.productId)));
+
+  //     setQuantities((prev) => {
+  //       const next = { ...prev };
+  //       cart.items.forEach((item) => {
+  //         if (next[item.productId] === undefined) {
+  //           next[item.productId] = item.qty.toString();
+  //         }
+  //       });
+  //       return next;
+  //     });
+  //   }
+  // }, [cart]);
+
   useEffect(() => {
     if (cart && cart.items.length > 0) {
       setSelectedItems(new Set(cart.items.map((item) => item.productId)));
 
-      setQuantities((prev) => {
-        const next = { ...prev };
-        cart.items.forEach((item) => {
-          if (next[item.productId] === undefined) {
-            next[item.productId] = item.qty.toString();
-          }
-        });
-        return next;
+      const newQuantities: Record<string, string> = {};
+      cart.items.forEach((item) => {
+        newQuantities[item.productId] = item.qty.toString();
       });
+      setQuantities(newQuantities);
     }
   }, [cart]);
 
