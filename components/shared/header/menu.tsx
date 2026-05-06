@@ -24,15 +24,15 @@ const Menu = ({
   const isRestricted =
     session?.user?.role === "admin" || session?.user?.role === "staff";
 
-  console.log(isRestricted);
-
-  console.log(notifications);
-
   return (
     <div className="flex justify-end gap-3">
       <nav className="hidden md:flex w-full max-w-xs gap-1">
         {/* <ModeToggle /> */}
-        {!isRestricted && <CartButton />}
+        {!isRestricted && (
+          <div className="mr-2">
+            <CartButton />
+          </div>
+        )}
 
         {isRestricted && (
           <NotificationBell session={session} notifications={notifications} />
@@ -49,7 +49,11 @@ const Menu = ({
           <SheetContent className="flex flex-col items-start p-6">
             <SheetTitle>Menu</SheetTitle>
             {/* <ModeToggle /> */}
-            {!isRestricted && <CartButton />}
+            {!isRestricted && (
+              <div>
+                <CartButton />
+              </div>
+            )}
             <UserButton session={session} />
             <SheetDescription></SheetDescription>
           </SheetContent>

@@ -34,6 +34,7 @@ const Header = ({
         <div className="hidden md:block">
           <Search categories={convertToPlainObject(categories)} />
         </div>
+
         <Menu session={session} />
       </div>
     </header>
