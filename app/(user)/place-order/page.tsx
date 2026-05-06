@@ -159,6 +159,13 @@ const PlaceOrderPage = async () => {
                 <div>{formatCurrency(cart.totalPrice)}</div>
               </div>
 
+              <div className="border-t pt-3 mt-3">
+                <p className="text-sm text-muted-foreground text-center">
+                  <strong>Returns & Exchanges:</strong> We accept returns for orders, however, payments are non-refundable. 
+                  Items may only be exchanged for another item.
+                </p>
+              </div>
+
               <div className="flex flex-col items-center gap-3">
                 <PlaceOrderForm />
                 <CancelOrderButton />
