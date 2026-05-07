@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,12 +10,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SearchIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Search = ({ categories }: { categories: any }) => {
+  const router = useRouter();
+
+  const handleCategoryChange = (value: string) => {
+    router.push(`/search?category=${value}&q=`);
+  };
+
   return (
     <form action="/search" method="GET">
       <div className="flex w-full max-w-sm items-center space-x-2">
-        <Select name="category">
+        <Select name="category" onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="All" />
           </SelectTrigger>
