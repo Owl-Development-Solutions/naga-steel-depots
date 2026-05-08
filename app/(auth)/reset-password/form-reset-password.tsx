@@ -39,16 +39,18 @@ const ResetFormPassword = ({ token }: { token: string }) => {
   const onSubmit = async (values: z.infer<typeof resetPasswordSchema>) => {
     startTransition(async () => {
       const { password } = values;
+
       const res = await resetPassword({
         token,
         password,
       });
 
-      if (!res.message) {
+      if (!res.success) {
         toast.error(res.message);
         return;
       }
 
+      toast.success(res.message);
       router.push("/sign-in");
     });
   };

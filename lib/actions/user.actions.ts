@@ -499,6 +499,8 @@ export async function clickForgotPassword(email: string) {
       message: "If an account exists, a reset link has been sent",
     };
   } catch (error) {
+    console.log(error);
+
     return {
       sucess: false,
       message: formatError(error),
@@ -516,7 +518,7 @@ export async function resetPassword({
   try {
     if (!token || !password) {
       return {
-        sucess: false,
+        success: false,
         message: "Token and password are required",
       };
     }
@@ -535,7 +537,7 @@ export async function resetPassword({
 
     if (!resetToken) {
       return {
-        sucess: false,
+        success: false,
         message: "Invalid or expired token",
       };
     }
@@ -546,7 +548,7 @@ export async function resetPassword({
       });
 
       return {
-        sucess: false,
+        success: false,
         message: "Token has expired",
       };
     }
@@ -564,12 +566,12 @@ export async function resetPassword({
     ]);
 
     return {
-      sucess: true,
-      message: "Password reset successful",
+      success: true,
+      message: "Password reset successfully",
     };
   } catch (error) {
     return {
-      sucess: false,
+      success: false,
       message: formatError(error),
     };
   }
