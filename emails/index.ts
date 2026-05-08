@@ -6,18 +6,141 @@ import PurchaseReceiptEmail from "./purchase-receipt";
 import BuildForgotPasswordHtml from "./forgot-password-email";
 import { EmailParams, Recipient, Sender } from "mailersend";
 import { mailerSend } from "./mail";
+import { formatCurrency } from "@/lib/utils";
 
 dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
+const sentFrom = new Sender(
+  "MS_6yRMXl@test-dnvo4d9yez9g5r86.mlsender.net",
+  "Naga Steel Depots",
+);
+
 export const sendPurchaseReceipt = async ({ order }: { order: Order }) => {
-  await resend.emails.send({
-    from: `${APP_NAME} <${SENDER_EMAIL}>`,
-    to: order.user.email,
-    subject: `Order Confirmation ${order.id}`,
-    react: PurchaseReceiptEmail({ order }),
+  // await resend.emails.send({
+  //   from: `${APP_NAME} <${SENDER_EMAIL}>`,
+  //   to: order.user.email,
+  //   subject: `Order Confirmation ${order.id}`,
+  //   react: PurchaseReceiptEmail({ order }),
+  // });
+
+  const dateFormatter = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
   });
+
+  const itemRows = order.orderitems
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding:12px 0;width:80px;vertical-align:top;">
+            <img
+              src="${item.image.startsWith("/") ? `${process.env.NEXT_PUBLIC_SERVER_URL}${item.image}` : item.image}"
+              alt="${item.name}"
+              width="80"
+              style="border-radius:8px;display:block;"
+            />
+          </td>
+          <td style="padding:12px 0 12px 16px;vertical-align:top;font-size:14px;color:#18181b;">
+            ${item.name} x ${item.qty}
+          </td>
+          <td style="padding:12px 0;vertical-align:top;text-align:right;font-size:14px;color:#18181b;">
+            ${formatCurrency(item.price)}
+          </td>
+        </tr>`,
+    )
+    .join("");
+
+  const summaryRows = [
+    { name: "Items", price: order.itemsPrice },
+    { name: "Tax", price: order.taxPrice },
+    { name: "Shipping", price: order.shippingPrice },
+    { name: "Total", price: order.totalPrice },
+  ]
+    .map(
+      ({ name, price }) => `
+        <tr>
+          <td style="padding:4px 0;text-align:right;font-size:14px;color:#71717a;">${name}:</td>
+          <td style="padding:4px 0;text-align:right;width:70px;font-size:14px;color:#18181b;font-weight:${name === "Total" ? "700" : "400"};">
+            ${formatCurrency(price)}
+          </td>
+        </tr>`,
+    )
+    .join("");
+
+  const recipients = [new Recipient(order.user.email, order.user.email)];
+
+  const emailParams = new EmailParams()
+    .setFrom(sentFrom)
+    .setTo(recipients)
+    .setSubject(`Order Confirmation ${order.id}`).setHtml(`
+      <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Purchase Receipt</title>
+      </head>
+      <body style="background:#f4f4f5;margin:0;padding:40px 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="center">
+              <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;border:1px solid #e4e4e7;padding:48px 40px;">
+                <tr>
+                  <td>
+                    <img
+                      src="https://imufildv0e.ufs.sh/f/V23buOIySRbrJv5bDY5RQcnbEPXhFqDtgV46emwdfsvLkMAK"
+                      alt="Naga Steel Depot"
+                      width="120"
+                      style="display:block;margin:0 0 24px;object-fit:contain;"
+                    />
+                    <p style="font-size:22px;font-weight:700;color:#18181b;margin:0 0 24px;">
+                      Purchase Receipt
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+                      <tr>
+                        <td style="vertical-align:top;">
+                          <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;text-transform:uppercase;letter-spacing:1px;">Order ID</p>
+                          <p style="margin:0;font-size:14px;color:#18181b;">${order.id}</p>
+                        </td>
+                        <td style="vertical-align:top;">
+                          <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;text-transform:uppercase;letter-spacing:1px;">Purchase Date</p>
+                          <p style="margin:0;font-size:14px;color:#18181b;">${dateFormatter.format(order.createdAt)}</p>
+                        </td>
+                        <td style="vertical-align:top;">
+                          <p style="margin:0 0 4px;font-size:12px;color:#a1a1aa;text-transform:uppercase;letter-spacing:1px;">Price Paid</p>
+                          <p style="margin:0;font-size:14px;font-weight:700;color:#18181b;">${formatCurrency(order.totalPrice)}</p>
+                        </td>
+                      </tr>
+                    </table>
+                    <table width="100%" cellpadding="0" cellspacing="0"
+                      style="border:1px solid #e4e4e7;border-radius:12px;padding:16px 24px;margin-bottom:8px;">
+                      <tbody>
+                        ${itemRows}
+                        <tr>
+                          <td colspan="3">
+                            <hr style="border:none;border-top:1px solid #e4e4e7;margin:8px 0 4px;" />
+                          </td>
+                        </tr>
+                        ${summaryRows}
+                      </tbody>
+                    </table>
+                    <hr style="border:none;border-top:1px solid #e4e4e7;margin:32px 0;" />
+                    <p style="font-size:12px;color:#a1a1aa;margin:0;text-align:center;">
+                      Thank you for your purchase — Naga Steel Depot
+                    </p>
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>    
+    `);
+
+  await mailerSend.email.send(emailParams);
 };
 
 export const sendPasswordResetEmail = async ({
@@ -27,10 +150,6 @@ export const sendPasswordResetEmail = async ({
   resetUrl: string;
   email: string;
 }) => {
-  const sentFrom = new Sender(
-    "MS_Qdjo9J@test-dnvo4d9yee9g5r86.mlsender.net",
-    "Naga Steel Depots",
-  );
   const recipients = [new Recipient(email, email)];
 
   const emailParams = new EmailParams()
@@ -51,7 +170,6 @@ export const sendPasswordResetEmail = async ({
           <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;border:1px solid #e4e4e7;padding:48px 40px;">
             <tr>
               <td>
-                <!-- Logo -->
                 <img
                   src="https://imufildv0e.ufs.sh/f/V23buOIySRbrJv5bDY5RQcnbEPXhFqDtgV46emwdfsvLkMAK"
                   alt="Naga Steel Depot"
