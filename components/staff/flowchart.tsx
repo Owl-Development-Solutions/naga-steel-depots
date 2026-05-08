@@ -248,7 +248,7 @@ export function StaffFlowchart() {
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             activeSection === "login" 
               ? "bg-blue-600 text-white" 
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-700"
           }`}
         >
           <User className="w-4 h-4 inline mr-2" />
@@ -259,7 +259,7 @@ export function StaffFlowchart() {
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             activeSection === "dashboard-main" 
               ? "bg-blue-600 text-white" 
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-700"
           }`}
         >
           <Home className="w-4 h-4 inline mr-2" />
@@ -270,7 +270,7 @@ export function StaffFlowchart() {
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             activeSection === "check-low-stock" 
               ? "bg-blue-600 text-white" 
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-700"
           }`}
         >
           <Package className="w-4 h-4 inline mr-2" />
@@ -281,7 +281,7 @@ export function StaffFlowchart() {
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             activeSection === "view-orders" 
               ? "bg-blue-600 text-white" 
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              : "bg-gray-100 text-gray-700"
           }`}
         >
           <ShoppingCart className="w-4 h-4 inline mr-2" />

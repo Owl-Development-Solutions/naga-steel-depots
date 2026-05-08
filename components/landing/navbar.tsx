@@ -68,14 +68,14 @@ const NavBarLanding = () => {
                 {link.href.startsWith("#") ? (
                   <button
                     onClick={() => scrollTo(link.href)}
-                    className="text-sm text-[#8899aa] hover:text-[#EAC04D] px-4 py-2 rounded transition-colors tracking-widest uppercase"
+                    className="text-sm text-[#8899aa]  px-4 py-2 rounded transition-colors tracking-widest uppercase"
                   >
                     {link.label}
                   </button>
                 ) : (
                   <Link
                     href={link.href}
-                    className="text-sm text-[#8899aa] hover:text-[#EAC04D] px-4 py-2 rounded transition-colors tracking-widest uppercase"
+                    className="text-sm text-[#8899aa]  px-4 py-2 rounded transition-colors tracking-widest uppercase"
                   >
                     {link.label}
                   </Link>
@@ -88,7 +88,7 @@ const NavBarLanding = () => {
           {/* CTA */}
           <button
             onClick={() => scrollTo("#contact")}
-            className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded border border-[#EAC04D]/60 text-[#EAC04D] hover:bg-[#EAC04D]/10 transition-all tracking-widest"
+            className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded border border-[#EAC04D]/60 text-[#EAC04D]  transition-all tracking-widest"
           >
             <span className="text-[#EAC04D]/50"></span> Get a Quote
           </button>
@@ -107,14 +107,14 @@ const NavBarLanding = () => {
                       {link.href.startsWith("#") ? (
                         <button
                           onClick={() => scrollTo(link.href)}
-                          className="font-mono text-sm text-[#8b9ab0] hover:text-[#EAC04D] transition-colors duration-200 cursor-pointer w-full text-left"
+                          className="font-mono text-sm text-[#8b9ab0]  transition-colors duration-200 cursor-pointer w-full text-left"
                         >
                           {link.label}
                         </button>
                       ) : (
                         <Link
                           href={link.href}
-                          className="font-mono text-sm text-[#8b9ab0] hover:text-[#EAC04D] transition-colors duration-200 block"
+                          className="font-mono text-sm text-[#8b9ab0]  transition-colors duration-200 block"
                         >
                           {link.label}
                         </Link>
@@ -124,7 +124,7 @@ const NavBarLanding = () => {
                 </ul>
                 <button
                   onClick={() => scrollTo("#contact")}
-                  className=" items-center gap-2 text-sm font-semibold px-4 py-2 rounded border border-[#EAC04D]/60 text-[#EAC04D] hover:bg-[#EAC04D]/10 transition-all tracking-widest"
+                  className=" items-center gap-2 text-sm font-semibold px-4 py-2 rounded border border-[#EAC04D]/60 text-[#EAC04D]  transition-all tracking-widest"
                 >
                   <span className="text-[#EAC04D]/50"></span> Get a Quote
                 </button>

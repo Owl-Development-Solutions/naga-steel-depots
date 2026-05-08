@@ -322,7 +322,7 @@ const EditOrderDetails = ({
             </Card>
 
             {/* Shipping Carrier - Bottom Left */}
-            <Card className="border-gray-200">
+            {/* <Card className="border-gray-200">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2 text-gray-700">
                   <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -348,10 +348,10 @@ const EditOrderDetails = ({
                   </SelectContent>
                 </Select>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Tracking Number - Bottom Right */}
-            <Card className="border-gray-200">
+            {/* <Card className="border-gray-200">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2 text-gray-700">
                   <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
@@ -369,7 +369,7 @@ const EditOrderDetails = ({
                   className="h-11"
                 />
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Order Notes Card */}

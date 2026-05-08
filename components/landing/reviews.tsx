@@ -65,7 +65,7 @@ const ReviewsLandingPage = () => {
           {reviews.map((review, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-[#161b22] rounded-xl p-8 border border-gray-200 dark:border-[#30363d] hover:border-[#114669]/50 transition-all duration-300"
+              className="bg-white dark:bg-[#161b22] rounded-xl p-8 border border-gray-200 dark:border-[#30363d] transition-all duration-300"
             >
               {/* Rating */}
               <StarRating rating={review.rating} />

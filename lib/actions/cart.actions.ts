@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma/browser";
 import { getUserById } from "./user.actions";
 
-const normalize = (text: string) => text.toLowerCase().replace(/[-\s]/g, "");
+const normalize = (text: string | undefined | null) => (text || "").toLowerCase().replace(/[-\s]/g, "");
 
 export async function addItemToCart(data: CartItem) {
   try {
@@ -26,8 +26,12 @@ export async function addItemToCart(data: CartItem) {
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
-    const userData = await getUserById(userId as string);
-    const userAddress = (userData.address as ShippingAddress)?.city;
+    // Only get user data if user is logged in
+    let userAddress = "";
+    if (userId) {
+      const userData = await getUserById(userId);
+      userAddress = (userData.address as ShippingAddress)?.city || "";
+    }
 
     console.log(userAddress);
 
@@ -136,8 +140,12 @@ export async function getMyCart() {
   const session = await auth();
   const userId = session?.user?.id ? (session.user.id as string) : undefined;
 
-  const userData = await getUserById(userId as string);
-  const userAddress = (userData.address as ShippingAddress).city;
+  // Only get user data if user is logged in
+  let userAddress = "";
+  if (userId) {
+    const userData = await getUserById(userId);
+    userAddress = (userData.address as ShippingAddress)?.city || "";
+  }
 
   const inside = normalize(userAddress).includes("lapulapu");
 
@@ -208,8 +216,13 @@ export async function removeItemFromCart(productId: string) {
     //get session and user id
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
-    const userData = await getUserById(userId as string);
-    const userAddress = (userData.address as ShippingAddress).city;
+    
+    // Only get user data if user is logged in
+    let userAddress = "";
+    if (userId) {
+      const userData = await getUserById(userId);
+      userAddress = (userData.address as ShippingAddress)?.city || "";
+    }
 
     //update cart in database
     await prisma.cart.update({
@@ -257,8 +270,13 @@ export async function setItemQty(productId: string, newQty: number) {
 
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
-    const userData = await getUserById(userId as string);
-    const userAddress = (userData.address as ShippingAddress)?.city;
+    
+    // Only get user data if user is logged in
+    let userAddress = "";
+    if (userId) {
+      const userData = await getUserById(userId);
+      userAddress = (userData.address as ShippingAddress)?.city || "";
+    }
 
     const items = cart.items as CartItem[];
     const existItem = items.find((x) => x.productId === productId);
@@ -361,8 +379,13 @@ export async function deleteItemFromCart(productId: string) {
 
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
-    const userData = await getUserById(userId as string);
-    const userAddress = (userData.address as ShippingAddress)?.city;
+    
+    // Only get user data if user is logged in
+    let userAddress = "";
+    if (userId) {
+      const userData = await getUserById(userId);
+      userAddress = (userData.address as ShippingAddress)?.city || "";
+    }
 
     await prisma.cart.update({
       where: { id: cart.id },

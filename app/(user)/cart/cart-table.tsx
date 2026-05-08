@@ -257,7 +257,7 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                 }}
               >
                 <ArrowRight className="w-4 h-4" />
-                Proceed to Checkout ({selectedItemsData.length})
+                Checkout ({selectedItemsData.length})
               </Button>
             </CardContent>
           </Card>
