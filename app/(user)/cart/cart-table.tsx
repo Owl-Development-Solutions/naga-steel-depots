@@ -18,6 +18,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Trash } from "lucide-react";
+import { CART_UPDATE_EVENT } from "@/components/shared/header/cart-button";
 import RemoveItemCartButton from "@/components/shared/product/remove-item-cart-btn";
 import AddToCartItemButton from "@/components/shared/product/add-item-cart-btn";
 import { Input } from "@/components/ui/input";
@@ -104,6 +105,9 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
           ...prev,
           [item.productId]: currentQty.toString(),
         }));
+      } else {
+        // Dispatch cart update event
+        window.dispatchEvent(new CustomEvent(CART_UPDATE_EVENT));
       }
     });
   };
