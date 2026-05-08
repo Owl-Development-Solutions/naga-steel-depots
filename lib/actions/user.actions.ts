@@ -19,6 +19,7 @@ import { PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { sendPasswordResetEmail } from "@/emails";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -460,4 +461,116 @@ export async function getUserDriver() {
   });
 
   return convertToPlainObject(user);
+}
+
+export async function clickForgotPassword(email: string) {
+  try {
+    if (!email) throw new Error("Email is required");
+
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLocaleLowerCase() },
+    });
+
+    await prisma.passwordResetToken.deleteMany({
+      where: { userId: user?.id },
+    });
+
+    const token = crypto.randomUUID().toString();
+
+    const expiresAt = new Date(Date.now() + 3600000); // 1 hour expiration
+
+    await prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user?.id as string,
+        expiresAt,
+      },
+    });
+
+    const resetUrl = `https://naga-steel-depots.vercel.app/reset-password?token=${token}`;
+
+    await sendPasswordResetEmail({
+      resetUrl,
+      email,
+    });
+
+    return {
+      success: true,
+      message: "If an account exists, a reset link has been sent",
+    };
+  } catch (error) {
+    return {
+      sucess: false,
+      message: formatError(error),
+    };
+  }
+}
+
+export async function resetPassword({
+  token,
+  password,
+}: {
+  token: string;
+  password: string;
+}) {
+  try {
+    if (!token || !password) {
+      return {
+        sucess: false,
+        message: "Token and password are required",
+      };
+    }
+
+    // if (password.length < 8) {
+    //   return {
+    //     sucess: false,
+    //     message: "Password must be at least 8 characters",
+    //   };
+    // }
+
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { user: true },
+    });
+
+    if (!resetToken) {
+      return {
+        sucess: false,
+        message: "Invalid or expired token",
+      };
+    }
+
+    if (new Date() > resetToken.expiresAt) {
+      await prisma.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      });
+
+      return {
+        sucess: false,
+        message: "Token has expired",
+      };
+    }
+
+    const hashedPassword = hashSync(password, 10);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: resetToken.userId },
+        data: { password: hashedPassword },
+      }),
+      prisma.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      }),
+    ]);
+
+    return {
+      sucess: true,
+      message: "Password reset successful",
+    };
+  } catch (error) {
+    return {
+      sucess: false,
+      message: formatError(error),
+    };
+  }
 }

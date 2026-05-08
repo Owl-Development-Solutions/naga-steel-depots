@@ -59,6 +59,12 @@ const CredentialsSignInForm = () => {
         </div>
         <div>
           <SignInButton />
+          <p className="text-center mt-5 text-muted-foreground">
+            Forgot password?{" "}
+            <span className="hover:underline hover:text-[#10456D]">
+              <Link href="/forgot-password">Click here</Link>
+            </span>
+          </p>
         </div>
 
         {data && !data.success && (
@@ -66,7 +72,11 @@ const CredentialsSignInForm = () => {
         )}
         <div className="text-sm text-center text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="sign-up" target="_self" className="link">
+          <Link
+            href="sign-up"
+            target="_self"
+            className="link hover:underline hover:text-[#10456D]"
+          >
             Sign Up
           </Link>
         </div>

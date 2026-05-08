@@ -3,6 +3,7 @@ import { SENDER_EMAIL, APP_DESCRIPTION, APP_NAME } from "@/lib/constants";
 import { Order } from "@/types";
 import dotenv from "dotenv";
 import PurchaseReceiptEmail from "./purchase-receipt";
+import BuildForgotPasswordHtml from "./forgot-password-email";
 dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
@@ -13,5 +14,20 @@ export const sendPurchaseReceipt = async ({ order }: { order: Order }) => {
     to: order.user.email,
     subject: `Order Confirmation ${order.id}`,
     react: PurchaseReceiptEmail({ order }),
+  });
+};
+
+export const sendPasswordResetEmail = async ({
+  resetUrl,
+  email,
+}: {
+  resetUrl: string;
+  email: string;
+}) => {
+  await resend.emails.send({
+    from: `${APP_NAME} <${SENDER_EMAIL}>`,
+    to: email,
+    subject: "Reset Your Password",
+    react: BuildForgotPasswordHtml({ resetUrl }),
   });
 };

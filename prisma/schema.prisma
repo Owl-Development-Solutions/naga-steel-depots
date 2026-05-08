@@ -43,25 +43,26 @@ model Product {
 }
 
 model User {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name           String          @default("NO_NAME")
-  email          String          @unique(map: "user_email_idx")
-  emailVerified  DateTime?
-  image          String?
-  password       String?
-  role           String          @default("user")
-  address        Json?           @db.Json
-  paymentMethod  String?
-  phoneNumber    String?
-  createdAt      DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt      DateTime        @updatedAt
-  accounts       Account[]
-  sessions       Session[]
-  carts          Cart[]
-  orders         Order[]
-  returnRequests ReturnRequest[]
-  reviews        Review[]
-  notifications  Notification[]
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String               @default("NO_NAME")
+  email               String               @unique(map: "user_email_idx")
+  emailVerified       DateTime?
+  image               String?
+  password            String?
+  role                String               @default("user")
+  address             Json?                @db.Json
+  paymentMethod       String?
+  phoneNumber         String?
+  createdAt           DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime             @updatedAt
+  accounts            Account[]
+  sessions            Session[]
+  carts               Cart[]
+  orders              Order[]
+  returnRequests      ReturnRequest[]
+  reviews             Review[]
+  notifications       Notification[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Account {
@@ -216,4 +217,16 @@ model Notification {
 
   @@index([userId, isRead])
   @@index([userId, createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token     String   @unique
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
 }

@@ -7,6 +7,7 @@ import {
   insertProductSchema,
   insertReviewSchema,
   paymentResultSchema,
+  resetPasswordSchema,
   shippingAddressSchema,
   updateUserSchema,
 } from "@/lib/validator";
@@ -44,6 +45,8 @@ export type User = z.infer<typeof createUserSchema> & {
   id?: string;
   name: string;
 };
+
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 // Category types
 export type CategoryCount = {

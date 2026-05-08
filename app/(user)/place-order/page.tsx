@@ -144,6 +144,7 @@ const PlaceOrderPage = async () => {
         <div>
           <Card>
             <CardContent className="p-4 gap-4 space-y-4">
+              {JSON.stringify(cart)}
               <div className="flex justify-between">
                 <div>Items</div>
                 <div>{formatCurrency(cart.itemsPrice)}</div>
@@ -161,8 +162,9 @@ const PlaceOrderPage = async () => {
 
               <div className="border-t pt-3 mt-3">
                 <p className="text-sm text-muted-foreground text-center">
-                  <strong>Returns & Exchanges:</strong> We accept returns for orders, however, payments are non-refundable. 
-                  Items may only be exchanged for another item.
+                  <strong>Returns & Exchanges:</strong> We accept returns for
+                  orders, however, payments are non-refundable. Items may only
+                  be exchanged for another item.
                 </p>
               </div>
 
