@@ -143,9 +143,13 @@ export const calcPrice = (items: CartItem[], city: string) => {
     items.reduce((acc, item) => acc + Number(item.price) * item.qty, 0),
   );
 
+  console.log("itemsprice", itemsPrice);
+
   const inside = normalize(city).includes("lapulapu");
 
   const shippingPrice = round2(inside ? 0 : 500);
+
+  console.log("shgps", shippingPrice);
 
   const taxPrice = 0;
 
