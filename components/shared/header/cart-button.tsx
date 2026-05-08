@@ -7,6 +7,9 @@ import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { getMyCart } from "@/lib/actions/cart.actions";
 
+// Custom event for cart updates
+export const CART_UPDATE_EVENT = 'cart-update';
+
 interface CartButtonProps {
   className?: string;
   showText?: boolean;
@@ -37,6 +40,17 @@ export default function CartButton({
 
   useEffect(() => {
     fetchCartCount();
+
+    // Listen for cart update events
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+
+    return () => {
+      window.removeEventListener(CART_UPDATE_EVENT, handleCartUpdate);
+    };
   }, []);
 
   return (

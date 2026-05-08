@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
+import { CART_UPDATE_EVENT } from "@/components/shared/header/cart-button";
 
 const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
   const router = useRouter();
@@ -37,6 +38,9 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
         return;
       }
 
+      // Dispatch cart update event
+      window.dispatchEvent(new CustomEvent(CART_UPDATE_EVENT));
+
       //handle success add to cart
       toast.success(res.message, {
         icon: icon,
@@ -57,6 +61,8 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
       const res = await removeItemFromCart(item.productId);
 
       if (res.success) {
+        // Dispatch cart update event
+        window.dispatchEvent(new CustomEvent(CART_UPDATE_EVENT));
         toast(res.message);
       } else {
         toast.error(res.message);
@@ -87,6 +93,9 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
       if (!res.success) {
         toast.error(res.message);
         setQuantity(currentQty.toString());
+      } else {
+        // Dispatch cart update event
+        window.dispatchEvent(new CustomEvent(CART_UPDATE_EVENT));
       }
 
       toast.success(res.message, {

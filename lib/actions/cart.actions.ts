@@ -159,9 +159,7 @@ export async function getMyCart() {
   if (!cart) return undefined;
 
   //custom total price
-  const totalPriceOrder = inside
-    ? cart.totalPrice.toString()
-    : Number(cart?.itemsPrice) + Number(shippingPrice);
+  const totalPriceOrder = Number(cart?.itemsPrice) + Number(shippingPrice);
 
   console.log("total", totalPriceOrder);
 

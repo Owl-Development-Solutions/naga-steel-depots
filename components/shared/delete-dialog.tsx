@@ -14,6 +14,7 @@ import {
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { CART_UPDATE_EVENT } from "@/components/shared/header/cart-button";
 
 const DeleteDialog = ({
   id,
@@ -37,6 +38,8 @@ const DeleteDialog = ({
       } else {
         setOpen(false);
         toast.success(res.message);
+        // Dispatch cart update event
+        window.dispatchEvent(new CustomEvent(CART_UPDATE_EVENT));
       }
     });
   };
