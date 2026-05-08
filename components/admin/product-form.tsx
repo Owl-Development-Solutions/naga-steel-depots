@@ -164,7 +164,7 @@ const ProductForm = ({
                     />
                     <Button
                       type="button"
-                      className="cursor-pointer bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 mt-2"
+                      className="cursor-pointer bg-gray-500 text-white px-4 py-1 mt-2"
                       onClick={() => {
                         form.setValue(
                           "slug",

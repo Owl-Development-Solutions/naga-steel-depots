@@ -50,7 +50,7 @@ const SignInPage = async (props: {
             />
           </Link>
 
-          <CardTitle className="text-center">Sign In</CardTitle>
+          {/* <CardTitle className="text-center">Sign In</CardTitle> */}
           <CardDescription className="text-center">
             Sign in to your account
           </CardDescription>

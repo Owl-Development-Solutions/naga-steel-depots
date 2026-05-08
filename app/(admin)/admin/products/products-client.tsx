@@ -205,6 +205,9 @@ export default function ProductsClientPage() {
               <TableHead className="font-semibold text-gray-700">
                 Rating
               </TableHead>
+              <TableHead className="font-semibold text-gray-700">
+                Date
+              </TableHead>
               <TableHead className="font-semibold text-gray-700 text-right">
                 Actions
               </TableHead>
@@ -213,7 +216,7 @@ export default function ProductsClientPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
+                <TableCell colSpan={8} className="text-center py-8">
                   <div className="flex items-center justify-center space-x-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                     <span className="text-gray-600">Loading products...</span>
@@ -276,6 +279,11 @@ export default function ProductsClientPage() {
                       </span>
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600">
+                      {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : "N/A"}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
@@ -296,7 +304,7 @@ export default function ProductsClientPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12">
+                <TableCell colSpan={8} className="text-center py-12">
                   <EmptyHistoryMessage
                     Icon={Package}
                     message={

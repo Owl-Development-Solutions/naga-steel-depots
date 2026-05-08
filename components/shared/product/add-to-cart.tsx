@@ -42,7 +42,7 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
         icon: icon,
         action: (
           <Button
-            className="bg-primary cursor-pointer text-white hover:bg-gray-800 "
+            className="bg-primary cursor-pointer text-white "
             onClick={() => router.push("/cart")}
           >
             Go to Cart
@@ -93,7 +93,7 @@ const AddToCart = ({ cart, item }: { cart?: Cart; item: CartItem }) => {
         icon: icon,
         action: (
           <Button
-            className="bg-primary cursor-pointer text-white hover:bg-gray-800 "
+            className="bg-primary cursor-pointer text-white "
             onClick={() => router.push("/cart")}
           >
             Go to Cart

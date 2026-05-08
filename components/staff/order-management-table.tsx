@@ -271,7 +271,7 @@ export default function OrderManagementTable({
           <TableBody>
             {orders.length > 0 ? (
               orders.map((order) => (
-                <TableRow key={order.id} className="hover:bg-muted/30 transition-colors">
+                <TableRow key={order.id} className="transition-colors">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-500">#{order.id.slice(-8)}</span>

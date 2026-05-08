@@ -22,7 +22,7 @@ const ProductImages = ({ images }: { images: string[] }) => {
             key={image}
             onClick={() => setCurrent(index)}
             className={cn(
-              "border mr-2 cursor-pointer hover:border-[#3A7CA5]",
+              "border mr-2 cursor-pointer",
               current === index && "border-[#0e4469]",
             )}
           >

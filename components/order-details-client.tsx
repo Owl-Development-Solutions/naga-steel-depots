@@ -199,7 +199,7 @@ export default function OrderDetailsClient({ orderId, type }: OrderDetailsClient
         <CardContent>
           <div className="space-y-3">
             {data.orderitems?.map((item: any, index: number) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+              <div key={index} className="flex items-center justify-between p-4 border rounded-lg transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                     {item.image ? (

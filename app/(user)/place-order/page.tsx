@@ -67,6 +67,11 @@ const PlaceOrderPage = async () => {
                 {userAddress.streetAddress}, {userAddress.city}{" "}
                 {userAddress.postalCode}, {userAddress.country}
               </p>
+              {userAddress.phoneNumber && (
+                <p className="text-sm text-gray-600">
+                   {userAddress.phoneNumber}
+                </p>
+              )}
 
               <div className="mt-3">
                 <Link href="/shipping-address">

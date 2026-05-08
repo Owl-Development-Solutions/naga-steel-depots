@@ -65,9 +65,9 @@ const FooterLandingPage = () => {
 
             {/* Social Links */}
             <div className="flex space-x-4">
-              <FaFacebook className="w-10 h-10  flex items-center justify-center text-gray-600  hover:text-[#EAC04D] hover:border-[#EAC04D]/50 transition-all duration-200" />
-              <FaInstagram className="w-10 h-10  flex items-center justify-center text-gray-600  hover:text-[#EAC04D] hover:border-[#EAC04D]/50 transition-all duration-200" />
-              <FaYoutube className="w-10 h-10  flex items-center justify-center text-gray-600  hover:text-[#EAC04D] hover:border-[#EAC04D]/50 transition-all duration-200" />
+              <FaFacebook className="w-10 h-10  flex items-center justify-center text-gray-600   hover:border-[#EAC04D]/50 transition-all duration-200" />
+              <FaInstagram className="w-10 h-10  flex items-center justify-center text-gray-600   hover:border-[#EAC04D]/50 transition-all duration-200" />
+              <FaYoutube className="w-10 h-10  flex items-center justify-center text-gray-600   hover:border-[#EAC04D]/50 transition-all duration-200" />
             </div>
           </div>
 
@@ -82,7 +82,7 @@ const FooterLandingPage = () => {
                   <a
                     href={link.href}
                     onClick={(e) => scrollToSection(e, link.href)}
-                    className="text-[#8b949e] hover:text-[#EAC04D] transition-colors duration-200"
+                    className="text-[#8b949e]  transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -102,7 +102,7 @@ const FooterLandingPage = () => {
                   <a
                     href={link.href}
                     onClick={(e) => scrollToSection(e, link.href)}
-                    className=" text-[#8b949e] hover:text-[#EAC04D] transition-colors duration-200"
+                    className=" text-[#8b949e]  transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -122,7 +122,7 @@ const FooterLandingPage = () => {
                   <a
                     href={link.href}
                     onClick={(e) => scrollToSection(e, link.href)}
-                    className="text-[#8b949e] hover:text-[#EAC04D] transition-colors duration-200"
+                    className="text-[#8b949e]  transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -145,7 +145,7 @@ const FooterLandingPage = () => {
                   <a
                     key={item}
                     href="#"
-                    className="text-gray-600 dark:text-[#8b949e] hover:text-[#EAC04D] transition-colors duration-200 text-sm"
+                    className="text-gray-600 dark:text-[#8b949e]  transition-colors duration-200 text-sm"
                   >
                     {item}
                   </a>

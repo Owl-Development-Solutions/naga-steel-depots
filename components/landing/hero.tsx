@@ -85,12 +85,11 @@ const HeroLanding = () => {
                 }}
               >
                 <span className="relative z-10">Browse Products →</span>
-                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-              </button>
+                              </button>
 
               <button
                 onClick={() => scrollTo("#contact")}
-                className="px-6 py-3 rounded  text-sm text-gray-600 dark:text-[#8b9ab0] border border-gray-300 dark:border-[#1e2d3d] hover:border-[#114669] hover:text-gray-900 dark:hover:text-white transition-all duration-200 cursor-pointer"
+                className="px-6 py-3 rounded  text-sm text-gray-600 dark:text-[#8b9ab0] border border-gray-300 dark:border-[#1e2d3d]  transition-all duration-200 cursor-pointer"
               >
                 Request a Quote
               </button>
