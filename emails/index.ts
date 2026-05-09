@@ -4,7 +4,7 @@ import { Order } from "@/types";
 import dotenv from "dotenv";
 import PurchaseReceiptEmail from "./purchase-receipt";
 import BuildForgotPasswordHtml from "./forgot-password-email";
-import { EmailParams, Recipient, Sender } from "mailersend";
+import MailerSend, { EmailParams, Recipient, Sender } from "mailersend";
 import { mailerSend } from "./mail";
 import { formatCurrency } from "@/lib/utils";
 
