@@ -186,6 +186,78 @@ const sampleData = {
       banner: "banner-4.jpg",
     },
   ],
+  steels: [
+    // Flat Products
+    "Steel plates",
+    "Steel sheets",
+    "Steel strips",
+    "Steel coils",
+    "Hot-rolled steel",
+    "Cold-rolled steel",
+    "Galvanized steel sheets",
+    "Color-coated steel sheets",
+
+    // Long Products
+    "Steel bars",
+    "Reinforcing bars (rebar)",
+    "Wire rods",
+    "Steel wires",
+    "Rails",
+
+    // Structural Steel
+    "I-beams",
+    "H-beams",
+    "Channels",
+    "Angles",
+    "T-sections",
+    "Hollow sections",
+
+    // Pipes & Tubes
+    "Seamless pipes",
+    "Welded pipes",
+    "ERW pipes",
+    "Stainless steel tubes",
+    "Boiler tubes",
+    "Line pipes",
+
+    // Stainless Steel Products
+    "Stainless steel sheets",
+    "Stainless steel coils",
+    "Stainless steel pipes",
+    "Stainless steel bars",
+    "Stainless steel fittings",
+    "Kitchen-grade stainless products",
+
+    // Special / Alloy Steels
+    "Tool steel",
+    "Alloy steel",
+    "Spring steel",
+    "High-speed steel",
+    "Bearing steel",
+    "Die steel",
+
+    // Fasteners & Hardware
+    "Bolts",
+    "Nuts",
+    "Screws",
+    "Washers",
+    "Nails",
+    "Hinges",
+    "Clamps",
+
+    // Fabricated & Structural Systems
+    "Steel trusses",
+    "Steel frames",
+    "Roofing systems",
+    "Steel decking",
+    "Fabricated beams",
+    "Industrial platforms",
+
+    // Steel by Grade / Type
+    "Carbon steel",
+    "Mild steel",
+    "Galvanized steel",
+  ],
 };
 
 export default sampleData;

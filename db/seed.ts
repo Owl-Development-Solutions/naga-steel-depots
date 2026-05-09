@@ -12,16 +12,26 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  await prisma.product.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.verificationToken.deleteMany();
-  await prisma.user.deleteMany();
+  // await prisma.product.deleteMany();
+  // await prisma.account.deleteMany();
+  // await prisma.session.deleteMany();
+  // await prisma.verificationToken.deleteMany();
+  // await prisma.user.deleteMany();
 
-  // await prisma.product.createMany({ data: sampleData.products });
-  await prisma.user.createMany({ data: sampleData.users });
+  // // await prisma.product.createMany({ data: sampleData.products });
+  // await prisma.user.createMany({ data: sampleData.users });
 
-  console.log(`Database seeded successfully`);
+  // console.log(`Database seeded successfully`);
+
+  for (const name of sampleData.steels) {
+    await prisma.category.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
+
+  console.log(`✅ Seeded ${sampleData.steels.length} categories.`);
 }
 
 main();

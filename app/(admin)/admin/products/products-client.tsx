@@ -64,6 +64,8 @@ export default function ProductsClientPage() {
         limit: currentLimit,
       });
 
+      console.log("useeffect", productsData);
+
       setProducts(productsData.data);
       setTotalPages(productsData.totalPage);
     } catch (error) {
@@ -237,9 +239,7 @@ export default function ProductsClientPage() {
                       <div className="font-medium text-gray-900">
                         {product.name}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {product.category}
-                      </div>
+                      <div className="text-sm text-gray-500"></div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -247,7 +247,7 @@ export default function ProductsClientPage() {
                       variant="secondary"
                       className="bg-blue-100 text-blue-800"
                     >
-                      {product.category}
+                      {product.category?.name ?? "Uncategorized"}
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium text-gray-900">
@@ -281,7 +281,9 @@ export default function ProductsClientPage() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm text-gray-600">
-                      {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : "N/A"}
+                      {product.createdAt
+                        ? new Date(product.createdAt).toLocaleDateString()
+                        : "N/A"}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">

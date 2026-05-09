@@ -31,8 +31,8 @@ const Search = ({ categories }: { categories: any }) => {
               All
             </SelectItem>
             {categories.map((c: any) => (
-              <SelectItem key={c.category} value={c.category}>
-                {c.category}
+              <SelectItem key={c.name} value={c.name}>
+                {c.name}
               </SelectItem>
             ))}
           </SelectContent>

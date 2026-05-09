@@ -9,7 +9,10 @@ const ProductCard = ({ product }: { product: Product }) => {
   return (
     <Card className="w-full max-w-sm hover:scale-105 hover:shadow-lg transition-all duration-300 hover:bg-gray-50">
       <CardHeader className="p-0">
-        <Link href={`/product/${product.slug}`} className="block hover:opacity-80 transition-opacity duration-200">
+        <Link
+          href={`/product/${product.slug}`}
+          className="block hover:opacity-80 transition-opacity duration-200"
+        >
           <Image
             src={product.images[0]}
             alt={product.name}
@@ -22,7 +25,10 @@ const ProductCard = ({ product }: { product: Product }) => {
       <CardContent className="grid gap-4">
         <div className="text-xs">{product.brand}</div>
 
-        <Link href={`/product/${product.slug}`} className="hover:text-primary transition-colors duration-200">
+        <Link
+          href={`/product/${product.slug}`}
+          className="hover:text-primary transition-colors duration-200"
+        >
           <h2 className="text-sm font-medium">{product.name}</h2>
         </Link>
 

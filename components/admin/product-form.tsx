@@ -22,11 +22,18 @@ import { Card, CardContent } from "../ui/card";
 import { Checkbox } from "../ui/checkbox";
 import Image from "next/image";
 import { Textarea } from "../ui/textarea";
-import { createProduct, updateProduct } from "@/lib/actions/product.actions";
 import { toast } from "sonner";
 import { UploadButton } from "@/lib/uploadthing";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import {
+  createProduct,
+  getAllCategories,
+  updateProduct,
+} from "@/lib/actions/product.actions";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { cn } from "@/lib/utils";
 
 const ProductForm = ({
   type,
@@ -35,23 +42,38 @@ const ProductForm = ({
   role,
 }: {
   type: "Create" | "Update";
-  product?: Product;
+  product?: any;
   productId?: string;
   role: string;
 }) => {
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
+
+  const productData = {
+    ...product,
+    category: product?.category,
+  };
+
+  console.log("productData", productData);
+
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof insertProductSchema>>({
     resolver: zodResolver(
       type === "Create" ? insertProductSchema : updateProductSchema,
     ) as Resolver<z.infer<typeof insertProductSchema>>,
-    defaultValues: type === "Update" ? product : productDefaultValues,
+    defaultValues: type === "Update" ? productData : productDefaultValues,
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof insertProductSchema>> = async (
     values,
   ) => {
-    //on create
     if (type === "Create") {
       const res = await createProduct(values);
       if (!res.success) {
@@ -92,9 +114,21 @@ const ProductForm = ({
     }
   };
 
+  const onError = (val: any) => {
+    console.log(val);
+  };
+
   const images = form.watch("images");
   const isFeatured = form.watch("isFeatured");
   const banner = form.watch("banner");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const data = await getAllCategories();
+      setCategories(data);
+    };
+    fetchCategories();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -108,7 +142,10 @@ const ProductForm = ({
           </Button>
         </Link>
       </div>
-      <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        className="space-y-8"
+        onSubmit={form.handleSubmit(onSubmit, onError)}
+      >
         <FieldGroup>
           <div className="flex flex-col items-start md:flex-row gap-5">
             {/* Name */}
@@ -140,7 +177,7 @@ const ProductForm = ({
             />
 
             {/* Slug */}
-            <Controller
+            {/* <Controller
               name="slug"
               control={form.control}
               render={({
@@ -181,13 +218,13 @@ const ProductForm = ({
                   )}
                 </Field>
               )}
-            />
+            /> */}
           </div>
 
           <div className="flex flex-col md:flex-row gap-5">
             {/* Category */}
             <Controller
-              name="category"
+              name="categoryId"
               control={form.control}
               render={({
                 field,
@@ -195,22 +232,114 @@ const ProductForm = ({
               }: {
                 field: ControllerRenderProps<
                   z.infer<typeof insertProductSchema>,
-                  "category"
+                  "categoryId"
                 >;
                 fieldState: ControllerFieldState;
-              }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Category</FieldLabel>
-                  <Input
-                    placeholder="Enter Category"
-                    {...field}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
+              }) => {
+                const filtered = categories.filter((cat) =>
+                  cat.name.toLowerCase().includes(search.toLowerCase()),
+                );
+
+                const selected = categories.find(
+                  (cat) => cat.id === field.value,
+                );
+
+                const exactMatch = categories.some(
+                  (cat) => cat.name.toLowerCase() === search.toLowerCase(),
+                );
+
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Category</FieldLabel>
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          ref={triggerRef}
+                          role="combobox"
+                          aria-expanded={open}
+                          className="w-full justify-between font-normal"
+                        >
+                          {selected
+                            ? selected.name
+                            : field.value && !selected
+                              ? field.value // custom typed value
+                              : "Select or type a category..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+
+                      <PopoverContent
+                        className="p-0"
+                        align="start"
+                        style={{ width: triggerRef.current?.offsetWidth }}
+                      >
+                        <div className="p-2 border-b">
+                          <Input
+                            placeholder="Search or type new category..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="h-8"
+                          />
+                        </div>
+
+                        <div className="max-h-60 overflow-y-auto">
+                          {search && !exactMatch && (
+                            <div
+                              onClick={() => {
+                                field.onChange(search);
+                                setOpen(false);
+                                setSearch("");
+                              }}
+                              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent border-b text-muted-foreground"
+                            >
+                              <span className="text-primary font-medium">
+                                + Add
+                              </span>
+                              &quot;{search}&quot; as new category
+                            </div>
+                          )}
+
+                          {filtered.length === 0 && !search ? (
+                            <p className="text-sm text-muted-foreground text-center py-4">
+                              No category found.
+                            </p>
+                          ) : (
+                            filtered.map((cat) => (
+                              <div
+                                key={cat.id}
+                                onClick={() => {
+                                  field.onChange(cat.id);
+                                  setOpen(false);
+                                  setSearch("");
+                                }}
+                                className={cn(
+                                  "flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent",
+                                  field.value === cat.id && "bg-accent",
+                                )}
+                              >
+                                <Check
+                                  className={cn(
+                                    "h-4 w-4 shrink-0",
+                                    field.value === cat.id
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                                {cat.name}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                );
+              }}
             />
 
             {/* Brand */}

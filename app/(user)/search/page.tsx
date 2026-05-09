@@ -130,8 +130,8 @@ const SearchPage = async (props: {
     <div className="grid md:grid-cols-5 md:gap-5">
       <div className="filter-links">
         {/* Category Links */}
-        <div className="text-xl mb-2 mt-3">Category</div>
-        <div>
+        {/* <div className="text-xl mb-2 mt-3">Category</div> */}
+        {/* <div>
           <ul className="space-y-1">
             <li>
               <Link
@@ -155,7 +155,7 @@ const SearchPage = async (props: {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
 
         {/* Price Links */}
         <div className="text-xl mb-2 mt-8">Price</div>
@@ -258,9 +258,14 @@ const SearchPage = async (props: {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {products.data.length === 0 && <div>No Products Found</div>}
-          {products.data.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {products.data.map((product) => {
+            const productData = {
+              ...product,
+              category: product.categoryId!,
+            };
+
+            return <ProductCard key={product.id} product={productData} />;
+          })}
         </div>
       </div>
     </div>
