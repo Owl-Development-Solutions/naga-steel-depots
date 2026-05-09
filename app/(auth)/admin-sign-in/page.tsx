@@ -8,9 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Link } from "lucide-react";
 import Image from "next/image";
 import { APP_NAME } from "@/lib/constants";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin Sign In",
+};
 
 const AdminLoginPage = async () => {
   const session = await auth();
