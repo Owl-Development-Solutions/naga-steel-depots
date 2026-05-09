@@ -25,14 +25,11 @@ const SignInPage = async (props: {
   const { callbackUrl } = await props.searchParams;
 
   const session = await auth();
+
   if (session) {
     const redirectUrl =
-      callbackUrl ||
-      (session.user.role === "admin"
-        ? "/admin/overview"
-        : session.user.role === "staff"
-          ? "/staff/dashboard"
-          : "/products");
+      callbackUrl || (session.user.role === "user" ? "/products" : "/");
+
     return redirect(redirectUrl);
   }
 

@@ -37,25 +37,67 @@ export async function signInWithCredentials(
       where: { email: user.email as string },
     });
 
-    const allowedRoles = ["admin", "staff"];
+    const allowedRoles = ["user"];
 
     if (!dbUser || !allowedRoles.includes(dbUser.role)) {
       return {
         success: false,
-        message: "Access denied. This portal is for administrators only.",
+        message: "Access denied. Please use the administrator authentication",
       };
     }
     await signIn("credentials", {
       ...user,
-      callbackUrl:
-        dbUser?.role === "admin"
-          ? "/admin/overview"
-          : dbUser?.role === "staff"
-            ? "/staff/dashboard"
-            : "/products",
+      callbackUrl: dbUser?.role === "user" ? "/products" : "",
     });
 
     return { success: true, message: "Sign in successfully" };
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    return {
+      success: false,
+      message: "Invalid email or password",
+    };
+  }
+}
+
+export async function signInAdminWithCredentials(
+  prevState: unknown,
+  formData: FormData,
+) {
+  try {
+    const user = siginInFormSchema.parse({
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
+
+    const dbUser = await prisma.user.findUnique({
+      where: {
+        email: user.email,
+      },
+    });
+
+    const allowedRoles = ["staff", "admin"];
+
+    if (!dbUser || !allowedRoles.includes(dbUser.role)) {
+      return {
+        success: false,
+        message: "Access denied. This portal is for administrator only.",
+      };
+    }
+
+    await signIn("credentials", {
+      ...user,
+      callbackUrl:
+        dbUser.role === "admin" ? "/admin/overview" : "/staff/dashboard",
+    });
+
+    return {
+      success: true,
+      message: "Sign in successfully",
+    };
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;

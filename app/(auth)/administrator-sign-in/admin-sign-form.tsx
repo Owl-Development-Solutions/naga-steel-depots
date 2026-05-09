@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { signInWithCredentials } from "@/lib/actions/user.actions";
+import { signInAdminWithCredentials } from "@/lib/actions/user.actions";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 const AdminSignInForm = () => {
-  const [data, action] = useActionState(signInWithCredentials, {
+  const [data, action] = useActionState(signInAdminWithCredentials, {
     success: false,
     message: "",
   });
