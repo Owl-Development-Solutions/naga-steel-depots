@@ -471,7 +471,7 @@ export async function clickForgotPassword(email: string) {
       where: { email: email.toLocaleLowerCase() },
     });
 
-    await prisma.passwordResetToken.deleteMany({
+    await prisma.passwordResetTokens.deleteMany({
       where: { userId: user?.id },
     });
 
@@ -479,7 +479,7 @@ export async function clickForgotPassword(email: string) {
 
     const expiresAt = new Date(Date.now() + 3600000); // 1 hour expiration
 
-    await prisma.passwordResetToken.create({
+    await prisma.passwordResetTokens.create({
       data: {
         token,
         userId: user?.id as string,
@@ -530,7 +530,7 @@ export async function resetPassword({
     //   };
     // }
 
-    const resetToken = await prisma.passwordResetToken.findUnique({
+    const resetToken = await prisma.passwordResetTokens.findUnique({
       where: { token },
       include: { user: true },
     });
@@ -543,7 +543,7 @@ export async function resetPassword({
     }
 
     if (new Date() > resetToken.expiresAt) {
-      await prisma.passwordResetToken.delete({
+      await prisma.passwordResetTokens.delete({
         where: { id: resetToken.id },
       });
 
@@ -560,7 +560,7 @@ export async function resetPassword({
         where: { id: resetToken.userId },
         data: { password: hashedPassword },
       }),
-      prisma.passwordResetToken.delete({
+      prisma.passwordResetTokens.delete({
         where: { id: resetToken.id },
       }),
     ]);
