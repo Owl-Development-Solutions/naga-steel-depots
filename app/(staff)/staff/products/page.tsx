@@ -112,7 +112,7 @@ export default async function ProductsUI(props: {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Category:</span>
-                    <span>{product.category}</span>
+                    <span> {product.category?.name ?? "Uncategorized"}</span>
                   </div>
 
                   <div className="flex justify-between text-sm">

@@ -20,7 +20,7 @@ const CategoryDrawer = ({ categories }: { categories: any }) => {
           <MenuIcon />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="h-full max-w-sm">
+      <DrawerContent className="h-full max-w-sm overflow-auto">
         <DrawerHeader>
           <DrawerTitle>Select a category</DrawerTitle>
           <div className="space-y-1 mt-4">
@@ -28,14 +28,14 @@ const CategoryDrawer = ({ categories }: { categories: any }) => {
               <Button
                 variant="ghost"
                 className="w-full justify-start"
-                key={x.category}
+                key={x.id}
                 asChild
               >
                 <DrawerClose asChild>
                   <Link
-                    href={`/search?category=${x.category.split(" ").join("+")}`}
+                    href={`/search?category=${x.name.split(" ").join("+")}`}
                   >
-                    {x.category} ({x._count})
+                    {x.name} ({x._count.products})
                   </Link>
                 </DrawerClose>
               </Button>

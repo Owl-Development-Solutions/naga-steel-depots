@@ -24,7 +24,6 @@ model Product {
   id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String
   slug              String      @unique(map: "product_slug_idx")
-  category          String
   images            String[]
   brand             String
   description       String
@@ -40,6 +39,8 @@ model Product {
   updatedAt         DateTime    @updatedAt
   orderItems        OrderItem[]
   reviews           Review[]
+  category          Category?   @relation(fields: [categoryId], references: [id])
+  categoryId        String?     @db.Uuid
 }
 
 model User {
@@ -229,4 +230,12 @@ model PasswordResetToken {
 
   @@index([userId])
   @@index([token])
+}
+
+model Category {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @updatedAt
+  products  Product[]
 }

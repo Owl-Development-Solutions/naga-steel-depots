@@ -23,8 +23,8 @@ export const zPhone = z.string().refine((arg) => {
 // schema for inserting products
 export const insertProductSchema = z.object({
   name: z.string().min(3, "Name must be at lest 3 characters"),
-  slug: z.string().min(3, "Slug must be at lest 3 characters"),
-  category: z.string().min(3, "Category must be at lest 3 characters"),
+  slug: z.string().optional(),
+  categoryId: z.string().min(3, "Category is required"),
   brand: z.string(),
   description: z.string().min(3, "Description must be at lest 3 characters"),
   stock: z.coerce.number(),
@@ -205,3 +205,9 @@ export const resetPasswordSchema = z
     message: "Password don't match",
     path: ["confirmPassword"],
   });
+
+export const transformText = (text: string | undefined) => {
+  const word = text?.split(" ").join("-").toLocaleLowerCase();
+
+  return word;
+};

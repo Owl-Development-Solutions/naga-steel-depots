@@ -22,7 +22,7 @@ const ProductDetails = async ({ productId }: { productId: string }) => {
       <div>
         <h2 className="text-xl font-semibold">{data?.name}</h2>
         <p className="text-sm text-muted-foreground">
-          {data?.category} • {data?.brand}
+          {data?.category?.name} • {data?.brand}
         </p>
       </div>
 
