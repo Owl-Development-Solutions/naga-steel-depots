@@ -5,8 +5,8 @@ import { NextResponse } from "next/server";
 const getAuthSecret = () => {
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) {
-    console.warn('NEXTAUTH_SECRET is not set. Using fallback for development.');
-    return 'development-secret-key-change-in-production';
+    console.warn("NEXTAUTH_SECRET is not set. Using fallback for development.");
+    return "development-secret-key-change-in-production";
   }
   return secret;
 };

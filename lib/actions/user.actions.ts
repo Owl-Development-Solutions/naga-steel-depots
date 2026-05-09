@@ -37,6 +37,13 @@ export async function signInWithCredentials(
       where: { email: user.email as string },
     });
 
+    if (!dbUser || dbUser.role !== "admin") {
+      return {
+        success: false,
+        message: "Access denied. This portal is for administrators only.",
+      };
+    }
+
     await signIn("credentials", {
       ...user,
       callbackUrl:
@@ -81,7 +88,7 @@ export async function signOutUser() {
     }
 
     // Admin and staff redirect to sign-in page, regular users also redirect
-    await signOut({ redirectTo: "/sign-in" });
+    await signOut({ redirectTo: isAdmin ? "/admin-sign-in" : "/sign-in" });
   } catch (error) {
     // Re-throw redirect errors to allow the redirect to happen
     if (isRedirectError(error)) {
