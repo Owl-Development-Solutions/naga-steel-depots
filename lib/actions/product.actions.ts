@@ -18,6 +18,11 @@ import { createProductUpdateNotification } from "./notification.actions";
 export const getLatestProducts = async () => {
   const data = await prisma.product.findMany({
     take: LATEST_PRODUCTS_LIMITS,
+    include: {
+      category: {
+        select: { id: true, name: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -28,6 +33,11 @@ export const getLatestProducts = async () => {
 export const getProductBySlug = async (slug: string) => {
   return await prisma.product.findFirst({
     where: { slug },
+    include: {
+      category: {
+        select: { id: true, name: true },
+      },
+    },
   });
 };
 
@@ -376,6 +386,11 @@ export async function getFeaturedProducts() {
   const data = await prisma.product.findMany({
     where: { isFeatured: true },
     orderBy: { createdAt: "desc" },
+    include: {
+      category: {
+        select: { id: true, name: true },
+      },
+    },
     take: 4,
   });
 

@@ -46,7 +46,7 @@ interface LowStockProduct {
   productName: string;
   currentStock: number;
   threshold: number;
-  category: string;
+  category: string | null;
   lastUpdated: Date | string;
   isFlagged: boolean;
   image: string;

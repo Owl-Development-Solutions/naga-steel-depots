@@ -4,6 +4,7 @@ import {
   getAllCategories,
   getAllProducts,
 } from "@/lib/actions/product.actions";
+import { Product } from "@/types";
 import Link from "next/link";
 import { PagesTopLoader } from "nextjs-toploader/pages";
 
@@ -259,12 +260,9 @@ const SearchPage = async (props: {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {products.data.length === 0 && <div>No Products Found</div>}
           {products.data.map((product) => {
-            const productData = {
-              ...product,
-              category: product.categoryId!,
-            };
-
-            return <ProductCard key={product.id} product={productData} />;
+            return (
+              <ProductCard key={product.id} product={product as Product} />
+            );
           })}
         </div>
       </div>
