@@ -162,3 +162,7 @@ export const calcPrice = (items: CartItem[], city: string) => {
     totalPrice: totalPrice.toFixed(2),
   };
 };
+
+export const formatNumberWithComma = (value: number | string): string => {
+  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
