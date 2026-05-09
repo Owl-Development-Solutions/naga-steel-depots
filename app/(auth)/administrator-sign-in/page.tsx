@@ -13,18 +13,20 @@ import { APP_NAME } from "@/lib/constants";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Admin Sign In",
+  title: "Administrator Sign In",
 };
 
 const AdminLoginPage = async () => {
   const session = await auth();
 
-  if (session?.user?.role === "admin") {
-    return redirect("/admin/overview");
-  }
-
-  if (session?.user && session.user.role !== "admin") {
-    return redirect("/");
+  if (session) {
+    const redirectUrl =
+      session.user.role === "admin"
+        ? "/admin/overview"
+        : session.user.role === "staff"
+          ? "/staff/dashboard"
+          : "/";
+    return redirect(redirectUrl);
   }
 
   return (
@@ -41,7 +43,7 @@ const AdminLoginPage = async () => {
             />
           </div>
 
-          <CardTitle className="text-center">Admin Portal</CardTitle>
+          <CardTitle className="text-center">Administrative Portal</CardTitle>
           <CardDescription className="text-center">Sign In</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

@@ -37,13 +37,14 @@ export async function signInWithCredentials(
       where: { email: user.email as string },
     });
 
-    if (!dbUser || dbUser.role !== "admin") {
+    const allowedRoles = ["admin", "staff"];
+
+    if (!dbUser || !allowedRoles.includes(dbUser.role)) {
       return {
         success: false,
         message: "Access denied. This portal is for administrators only.",
       };
     }
-
     await signIn("credentials", {
       ...user,
       callbackUrl:
@@ -72,9 +73,6 @@ export async function signOutUser() {
   try {
     const session = await auth();
 
-    const isAdmin = session?.user?.role === "admin";
-    const isStaff = session?.user?.role === "staff";
-
     // Get cart directly without calling getMyCart() which may fail for users without address
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
     if (sessionCartId && session?.user?.id) {
@@ -87,8 +85,14 @@ export async function signOutUser() {
       }
     }
 
+    const allowedRoles = ["admin", "staff"];
+
     // Admin and staff redirect to sign-in page, regular users also redirect
-    await signOut({ redirectTo: isAdmin ? "/admin-sign-in" : "/sign-in" });
+    await signOut({
+      redirectTo: allowedRoles.includes(session?.user?.role as string)
+        ? "/administrator-sign-in"
+        : "/sign-in",
+    });
   } catch (error) {
     // Re-throw redirect errors to allow the redirect to happen
     if (isRedirectError(error)) {
