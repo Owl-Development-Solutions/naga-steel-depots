@@ -147,7 +147,8 @@ const ProductForm = ({
         onSubmit={form.handleSubmit(onSubmit, onError)}
       >
         <FieldGroup>
-          <div className="flex flex-col items-start md:flex-row gap-5">
+          {/* Row 1: Name and Category */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Name */}
             <Controller
               name="name"
@@ -176,52 +177,6 @@ const ProductForm = ({
               )}
             />
 
-            {/* Slug */}
-            {/* <Controller
-              name="slug"
-              control={form.control}
-              render={({
-                field,
-                fieldState,
-              }: {
-                field: ControllerRenderProps<
-                  z.infer<typeof insertProductSchema>,
-                  "slug"
-                >;
-                fieldState: ControllerFieldState;
-              }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel>Slug</FieldLabel>
-                  <div className="relative">
-                    {" "}
-                    <Input
-                      placeholder="Enter product name"
-                      {...field}
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <Button
-                      type="button"
-                      className="cursor-pointer bg-gray-500 text-white px-4 py-1 mt-2"
-                      onClick={() => {
-                        form.setValue(
-                          "slug",
-                          slugify(form.getValues("name"), { lower: true }),
-                        );
-                      }}
-                    >
-                      Generate
-                    </Button>
-                  </div>
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            /> */}
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-5">
             {/* Category */}
             <Controller
               name="categoryId"
@@ -341,7 +296,10 @@ const ProductForm = ({
                 );
               }}
             />
+          </div>
 
+          {/* Row 2: Brand and Price */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Brand */}
             <Controller
               name="brand"
@@ -369,9 +327,7 @@ const ProductForm = ({
                 </Field>
               )}
             />
-          </div>
 
-          <div className="flex flex-col md:flex-row gap-5">
             {/* Price */}
             <Controller
               name="price"
@@ -393,6 +349,40 @@ const ProductForm = ({
                     {...field}
                     aria-invalid={fieldState.invalid}
                   />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+
+          {/* Row 3: Promo Price and Stock */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Promo Price */}
+            <Controller
+              name="promoPrice"
+              control={form.control}
+              render={({
+                field,
+                fieldState,
+              }: {
+                field: ControllerRenderProps<
+                  z.infer<typeof insertProductSchema>,
+                  "promoPrice"
+                >;
+                fieldState: ControllerFieldState;
+              }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Promo Price</FieldLabel>
+                  <Input
+                    placeholder="Enter Promo Price (Optional)"
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Discounted price for promotional offers
+                  </p>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -429,7 +419,8 @@ const ProductForm = ({
             />
           </div>
 
-          <div className="flex flex-col md:flex-row gap-5">
+          {/* Row 4: Low Stock Threshold and Flag for Restock */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Low Stock Threshold */}
             <Controller
               name="lowStockThreshold"
@@ -605,7 +596,6 @@ const ProductForm = ({
 
           {/* Description */}
           <div>
-            {" "}
             <Controller
               control={form.control}
               name="description"
