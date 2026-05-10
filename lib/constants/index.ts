@@ -73,6 +73,7 @@ export const productDefaultValues = {
   brand: "",
   description: "",
   price: "0",
+  promoPrice: "",
   stock: 0,
   rating: "0",
   numReviews: "0",
