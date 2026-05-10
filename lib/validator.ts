@@ -21,38 +21,47 @@ export const zPhone = z.string().refine((arg) => {
 }, "Invalid phone number");
 
 // schema for inserting products
-export const insertProductSchema = z.object({
-  name: z.string().min(3, "Name must be at lest 3 characters"),
-  slug: z.string().optional(),
-  categoryId: z.string().min(3, "Category is required"),
-  brand: z.string(),
-  description: z.string().min(3, "Description must be at lest 3 characters"),
-  stock: z.coerce.number(),
-  images: z.array(z.string().min(1, "Products must have at least one image")),
-  isFeatured: z.boolean(),
-  banner: z.string().nullable(),
-  price: currency,
-  promoPrice: currency.optional(),
-  lowStockThreshold: z.coerce
-    .number()
-    .int()
-    .positive("Threshold must be positive")
-    .default(10),
-  isFlagged: z.boolean().default(false),
-}).refine((data) => {
-  // Only validate promo price if it's provided
-  if (data.promoPrice === undefined || data.promoPrice === null || data.promoPrice === "") {
-    return true;
-  }
-  
-  const price = parseFloat(data.price);
-  const promoPrice = parseFloat(data.promoPrice);
-  
-  return promoPrice <= price;
-}, {
-  message: "Promo price must be less than or equal to regular price",
-  path: ["promoPrice"],
-});
+export const insertProductSchema = z
+  .object({
+    name: z.string().min(3, "Name must be at lest 3 characters"),
+    slug: z.string().optional(),
+    categoryId: z.string().min(3, "Category is required"),
+    brand: z.string(),
+    description: z.string().min(3, "Description must be at lest 3 characters"),
+    stock: z.coerce.number(),
+    images: z.array(z.string().min(1, "Products must have at least one image")),
+    isFeatured: z.boolean(),
+    banner: z.string().nullable(),
+    price: currency,
+    promoPrice: currency.optional() as any,
+    lowStockThreshold: z.coerce
+      .number()
+      .int()
+      .positive("Threshold must be positive")
+      .default(10),
+    isFlagged: z.boolean().default(false),
+  })
+  .refine(
+    (data) => {
+      // Only validate promo price if it's provided
+      if (
+        data.promoPrice === undefined ||
+        data.promoPrice === null ||
+        data.promoPrice === ""
+      ) {
+        return true;
+      }
+
+      const price = parseFloat(data.price);
+      const promoPrice = parseFloat(data.promoPrice);
+
+      return promoPrice <= price;
+    },
+    {
+      message: "Promo price must be less than or equal to regular price",
+      path: ["promoPrice"],
+    },
+  );
 
 //schema for updating products
 export const updateProductSchema = insertProductSchema.extend({

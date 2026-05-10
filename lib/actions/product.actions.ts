@@ -185,10 +185,20 @@ export async function getAllProducts({
   const priceFilter: Prisma.ProductWhereInput =
     price && price !== "all"
       ? {
-          price: {
-            gte: Number(price.split("-")[0]),
-            lte: Number(price.split("-")[1]),
-          },
+          OR: [
+            {
+              price: {
+                gte: Number(price.split("-")[0]),
+                lte: Number(price.split("-")[1]),
+              },
+            },
+            {
+              promoPrice: {
+                gte: Number(price.split("-")[0]),
+                lte: Number(price.split("-")[1]),
+              },
+            },
+          ],
         }
       : {};
 
