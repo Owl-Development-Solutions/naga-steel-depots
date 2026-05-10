@@ -113,12 +113,6 @@ const UsersAdminTable = ({ users }: { users: any }) => {
                         <Mail />
                         Send email
                       </DropdownMenuItem> */}
-                      <DropdownMenuSeparator />
-                      <DeleteDialog
-                        id={user.id!}
-                        action={deleteUser as any}
-                        classNames="w-full"
-                      />
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

@@ -119,8 +119,6 @@ export default async function OrdersPage(props: {
                   <Button asChild variant="outline" size="sm">
                     <Link href={`/order/${order.id}`}>Details</Link>
                   </Button>
-
-                  <DeleteDialog id={order.id} action={deleteOrder as any} />
                 </TableCell>
               </TableRow>
             ))
