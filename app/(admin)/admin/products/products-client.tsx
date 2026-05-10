@@ -296,10 +296,10 @@ export default function ProductsClientPage() {
                       >
                         <Link href={`/admin/products/${product.id}`}>Edit</Link>
                       </Button>
-                      <DeleteDialog
+                      {/* <DeleteDialog
                         id={product.id}
                         action={deleteProduct as any}
-                      />
+                      /> */}
                     </div>
                   </TableCell>
                 </TableRow>

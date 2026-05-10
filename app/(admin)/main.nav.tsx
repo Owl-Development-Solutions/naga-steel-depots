@@ -21,6 +21,10 @@ const links = [
     title: "Users",
     href: "/admin/users",
   },
+  {
+    title: "Audit Trail",
+    href: "/admin/audit-trail",
+  },
 ];
 
 const MainNav = ({
