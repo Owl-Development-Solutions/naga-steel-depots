@@ -85,7 +85,7 @@ export default function AuditTrailPage() {
                 className="bg-[#1F4F70] hover:bg-[#173c56] text-white shadow-sm"
               >
                 <Download className="w-4 h-4 mr-2" />
-                Export Report
+                Export
               </Button>
 
               <span className="px-3 py-1.5 bg-indigo-50 text-[#173c56] text-sm font-semibold rounded-full border border-indigo-100">
