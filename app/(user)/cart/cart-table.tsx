@@ -200,7 +200,9 @@ const CartTable = ({ cart }: { cart?: Cart }) => {
                         />
                       </div>
                     </TableCell>
-                    <TableCell className="text-center">₱{item.price}</TableCell>
+                    <TableCell className="text-center">
+                      {formatCurrency(item.price)}
+                    </TableCell>
                     <TableCell className="text-center">
                       <DeleteDialog
                         id={item.productId}

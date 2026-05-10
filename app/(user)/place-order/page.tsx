@@ -18,8 +18,6 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
-import { X } from "lucide-react";
 import CancelOrderButton from "./cancel-order";
 import PlaceOrderForm from "./place-order-form";
 
@@ -69,7 +67,7 @@ const PlaceOrderPage = async () => {
               </p>
               {userAddress.phoneNumber && (
                 <p className="text-sm text-gray-600">
-                   {userAddress.phoneNumber}
+                  {userAddress.phoneNumber}
                 </p>
               )}
 
@@ -131,7 +129,7 @@ const PlaceOrderPage = async () => {
                         <span className="px-2">{item.qty}</span>
                       </TableCell>
 
-                      <TableCell>₱{item.price}</TableCell>
+                      <TableCell>{formatCurrency(item.price)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -144,7 +142,6 @@ const PlaceOrderPage = async () => {
         <div>
           <Card>
             <CardContent className="p-4 gap-4 space-y-4">
-              
               <div className="flex justify-between">
                 <div>Items</div>
                 <div>{formatCurrency(cart.itemsPrice)}</div>
