@@ -21,8 +21,8 @@ const Products = async () => {
         limit={4}
       />
       <ViewAllProductsButton />
-      {/* <DealCountDown /> */}
-      {/* <IconBoxes /> */}
+      <DealCountDown />
+      <IconBoxes />
     </>
   );
 };
