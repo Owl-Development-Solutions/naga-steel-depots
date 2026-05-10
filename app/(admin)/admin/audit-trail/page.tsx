@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useTransition } from "react";
-import { ShieldCheck } from "lucide-react";
+import { Download, ShieldCheck } from "lucide-react";
 import {
+  exportAuditLogs,
   getAuditLogs,
   type AuditLogFilters,
   type AuditLogResult,
@@ -11,6 +12,7 @@ import { AuditFilterBar } from "@/components/admin/audit-filter-bar";
 import { AuditTable } from "@/components/admin/audit-table";
 import { AuditPagination } from "@/components/admin/audit-pagination";
 import { AuditDetailModal } from "@/components/admin/audit-modal";
+import { Button } from "@/components/ui/button";
 
 const DEFAULT_FILTERS: AuditLogFilters = { page: 1, pageSize: 20 };
 
@@ -35,6 +37,29 @@ export default function AuditTrailPage() {
     fetchLogs(filters);
   }, [filters, fetchLogs]);
 
+  const handleExport = async () => {
+    const base64 = await exportAuditLogs(filters);
+
+    const binary = atob(base64);
+
+    const bytes = new Uint8Array([...binary].map((char) => char.charCodeAt(0)));
+
+    const blob = new Blob([bytes], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = `audit-logs-${Date.now()}.xlsx`;
+
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/60 p-6">
       <div className="max-w-screen-xl mx-auto space-y-5">
@@ -54,9 +79,19 @@ export default function AuditTrailPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-sm font-semibold rounded-full border border-indigo-100">
-              {total.toLocaleString()} records
-            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleExport}
+                className="bg-[#1F4F70] hover:bg-[#173c56] text-white shadow-sm"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Report
+              </Button>
+
+              <span className="px-3 py-1.5 bg-indigo-50 text-[#173c56] text-sm font-semibold rounded-full border border-indigo-100">
+                {total.toLocaleString()} records
+              </span>
+            </div>
           </div>
         </div>
 

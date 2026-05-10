@@ -94,7 +94,7 @@ export function AuditPagination({
                   }}
                   className={
                     p === page
-                      ? "bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 hover:text-white"
+                      ? "bg-[#173c56] text-white border-[#173c56] hover:bg-[#173c56] hover:text-white"
                       : ""
                   }
                 >

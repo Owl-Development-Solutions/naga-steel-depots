@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, formatValueJSON } from "@/lib/utils";
 
 interface ChangeDiffProps {
   changes: Record<string, { old: unknown; new: unknown }>;
@@ -22,17 +22,17 @@ export function ChangeDiff({ changes, compact = false }: ChangeDiffProps) {
           <span className="text-slate-500 truncate pt-0.5">{field}</span>
 
           <span
-            className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded border border-red-100 line-through truncate"
-            title={String(o ?? "")}
+            className="bg-red-50 text-red-700 px-1.5 py-0.5 rounded border border-red-100 break-words whitespace-pre-wrap"
+            title={formatValueJSON(o)}
           >
-            {String(o ?? "—")}
+            {formatValueJSON(o)}
           </span>
 
           <span
-            className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100 truncate"
-            title={String(n ?? "")}
+            className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100 break-words whitespace-pre-wrap"
+            title={formatValueJSON(n)}
           >
-            {String(n ?? "—")}
+            {formatValueJSON(n)}
           </span>
         </div>
       ))}
