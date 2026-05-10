@@ -32,12 +32,26 @@ export const insertProductSchema = z.object({
   isFeatured: z.boolean(),
   banner: z.string().nullable(),
   price: currency,
+  promoPrice: currency.optional(),
   lowStockThreshold: z.coerce
     .number()
     .int()
     .positive("Threshold must be positive")
     .default(10),
   isFlagged: z.boolean().default(false),
+}).refine((data) => {
+  // Only validate promo price if it's provided
+  if (data.promoPrice === undefined || data.promoPrice === null || data.promoPrice === "") {
+    return true;
+  }
+  
+  const price = parseFloat(data.price);
+  const promoPrice = parseFloat(data.promoPrice);
+  
+  return promoPrice <= price;
+}, {
+  message: "Promo price must be less than or equal to regular price",
+  path: ["promoPrice"],
 });
 
 //schema for updating products
