@@ -34,6 +34,7 @@ import {
 } from "@/lib/actions/product.actions";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
+import { deleteImage } from "@/lib/actions/upload-thing-actionts";
 
 const ProductForm = ({
   type,
@@ -501,23 +502,50 @@ const ProductForm = ({
               render={() => (
                 <Card className="w-full">
                   <CardContent className="space-y-2 mt-2 min-h-48">
-                    <div className="flex-start space-x-2">
-                      {images.map((image: string) => (
-                        <Image
-                          key={image}
-                          src={image}
-                          alt="product-image"
-                          className="w-20 h-20 object-cover object-center rounded-sm"
-                          width={100}
-                          height={100}
-                        />
+                    <div className="flex flex-wrap gap-2">
+                      {images.map((image: string, index: number) => (
+                        <div key={image} className="relative group">
+                          <Image
+                            src={image}
+                            alt={`product-image-${index}`}
+                            className="w-20 h-20 object-cover object-center rounded-sm"
+                            width={100}
+                            height={100}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const result = await deleteImage(image);
+
+                                if (result.success) {
+                                  const newImages = images.filter(
+                                    (_, i) => i !== index,
+                                  );
+                                  form.setValue("images", newImages);
+                                  toast.success("Image removed successfully");
+                                } else {
+                                  toast.error(result.message);
+                                }
+                              } catch (error) {
+                                toast.error("Failed to remove image");
+                              }
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                            aria-label="Remove image"
+                          >
+                            ×
+                          </button>
+                        </div>
                       ))}
 
                       <Field>
                         <UploadButton
                           endpoint="imageUploader"
                           onClientUploadComplete={(res: { url: string }[]) => {
-                            form.setValue("images", [...images, res[0].url]);
+                            const newUrls = res.map((item) => item.url);
+                            form.setValue("images", [...images, ...newUrls]);
                           }}
                           onUploadError={(err: Error) => {
                             toast.error(`ERROR! ${err.message}`);
