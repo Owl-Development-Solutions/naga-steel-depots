@@ -6,6 +6,7 @@ import { formatError } from "../utils";
 import { auth } from "@/auth";
 import { prisma } from "@/db/prisma";
 import { revalidatePath } from "next/cache";
+import { createAuditLog } from "./audit.actions";
 
 // create and update reviews
 export async function createUpdateReview(
@@ -81,6 +82,33 @@ export async function createUpdateReview(
           numReviews,
         },
       });
+    });
+
+    await createAuditLog({
+      action: reviewExist ? "UPDATE" : "CREATE",
+      entity: "Review",
+      entityId: reviewExist?.id,
+      entityName: `Review for "${product.name}"`,
+      changes: reviewExist
+        ? {
+            ...(reviewExist.rating !== review.rating && {
+              rating: { old: reviewExist.rating, new: review.rating },
+            }),
+            ...(reviewExist.title !== review.title && {
+              title: { old: reviewExist.title, new: review.title },
+            }),
+            ...(reviewExist.description !== review.description && {
+              description: {
+                old: reviewExist.description,
+                new: review.description,
+              },
+            }),
+          }
+        : undefined,
+      metadata: {
+        productId: review.productId,
+        productSlug: product.slug,
+      },
     });
 
     revalidatePath(`/product/${product.slug}`);

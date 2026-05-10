@@ -101,13 +101,13 @@ export default async function OrdersPage(props: {
 
                 <TableCell>
                   {order.isDelivered && order.deliveredAt
-                    ? formatDateTime(order.deliveredAt).dateTime
+                    ? `Delivered at ${formatDateTime(order.deliveredAt).dateTime}`
                     : "Not Delivered"}
                 </TableCell>
 
                 <TableCell>
                   {order.isPaid && order.paidAt
-                    ? formatDateTime(order.paidAt).dateTime
+                    ? `Paid at ${formatDateTime(order.paidAt).dateTime}`
                     : "Not Paid"}
                 </TableCell>
 

@@ -19,6 +19,7 @@ import { Prisma } from "../generated/prisma/client";
 import { PAGE_SIZE } from "../constants";
 import { sendPurchaseReceipt } from "@/emails";
 import { createOrderPlacedNotification } from "./notification.actions";
+import { createAuditLog } from "./audit.actions";
 
 //create order and create the order items
 // export async function createOrder() {
@@ -226,6 +227,19 @@ export async function createOrder() {
 
     if (!insertedOrderId) throw new Error("Order not created");
 
+    await createAuditLog({
+      action: "CREATE",
+      entity: "Order",
+      entityId: insertedOrderId,
+      entityName: `Order by ${user.name}`,
+      metadata: {
+        itemCount: selectedItems.length,
+        totalPrice: selectedPrices.totalPrice,
+        paymentMethod: user.paymentMethod,
+        shippingAddress: (user.address as ShippingAddress)?.city,
+      },
+    });
+
     await createOrderPlacedNotification({
       orderId: insertedOrderId,
       orderTotal: Number(selectedPrices.totalPrice),
@@ -343,6 +357,21 @@ export async function approvePaypalOrder(
 
     revalidatePath(`/order/${orderId}`);
 
+    await createAuditLog({
+      action: "STATUS_CHANGE",
+      entity: "Order",
+      entityId: orderId,
+      entityName: `Order #${orderId}`,
+      changes: {
+        isPaid: { old: false, new: true },
+        paymentMethod: { old: null, new: "PayPal" },
+      },
+      metadata: {
+        paypalOrderId: data.orderID,
+        captureId: captureData.id,
+      },
+    });
+
     return {
       success: true,
       message: "Your order has been paid",
@@ -414,6 +443,22 @@ async function updateOrderToPaid({
       ...updatedOrder,
       shippingAddress: updatedOrder.shippingAddress as ShippingAddress,
       paymentResult: updatedOrder.paymentResult as PaymentResult,
+    },
+  });
+
+  await createAuditLog({
+    action: "STATUS_CHANGE",
+    entity: "Order",
+    entityId: orderId,
+    entityName: `Order #${orderId}`,
+    changes: {
+      isPaid: { old: false, new: true },
+      paidAt: { old: null, new: new Date().toISOString() },
+    },
+    metadata: {
+      paymentResult,
+      customerEmail: updatedOrder.user.email,
+      customerName: updatedOrder.user.name,
     },
   });
 }
@@ -585,6 +630,14 @@ export async function deleteOrder(id: string) {
       where: { id },
     });
 
+    await createAuditLog({
+      action: "DELETE",
+      entity: "Order",
+      entityId: id,
+      entityName: `Order #${id}`,
+      metadata: { deletedFrom: "admin-panel" },
+    });
+
     revalidatePath("/admin/orders");
 
     return {
@@ -639,6 +692,18 @@ export async function deliverOrder(orderId: string) {
         isDelivered: true,
         deliveredAt: new Date(),
       },
+    });
+
+    await createAuditLog({
+      action: "STATUS_CHANGE",
+      entity: "Order",
+      entityId: orderId,
+      entityName: `Order #${orderId}`,
+      changes: {
+        isDelivered: { old: false, new: true },
+        deliveredAt: { old: null, new: new Date().toISOString() },
+      },
+      metadata: { markedBy: "admin" },
     });
 
     revalidatePath(`/order/${orderId}`);

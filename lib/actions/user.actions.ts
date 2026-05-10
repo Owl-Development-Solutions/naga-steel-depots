@@ -20,6 +20,7 @@ import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { sendPasswordResetEmail } from "@/emails";
+import { createAuditLog } from "./audit.actions";
 
 // Sign in the user with credentials
 export async function signInWithCredentials(
@@ -48,6 +49,14 @@ export async function signInWithCredentials(
     await signIn("credentials", {
       ...user,
       callbackUrl: dbUser?.role === "user" ? "/products" : "",
+    });
+
+    await createAuditLog({
+      action: "LOGIN",
+      entity: "User",
+      entityId: dbUser.id,
+      entityName: dbUser.name,
+      metadata: { role: dbUser.role, portal: "user" },
     });
 
     return { success: true, message: "Sign in successfully" };
@@ -88,6 +97,14 @@ export async function signInAdminWithCredentials(
       };
     }
 
+    await createAuditLog({
+      action: "LOGIN",
+      entity: "User",
+      entityId: dbUser.id,
+      entityName: dbUser.name,
+      metadata: { role: dbUser.role, portal: "admin" },
+    });
+
     await signIn("credentials", {
       ...user,
       callbackUrl:
@@ -127,6 +144,14 @@ export async function signOutUser() {
       }
     }
 
+    await createAuditLog({
+      action: "LOGOUT",
+      entity: "User",
+      entityId: session?.user?.id,
+      entityName: session?.user?.name!,
+      metadata: { role: session?.user?.role },
+    });
+
     const allowedRoles = ["admin", "staff"];
 
     // Admin and staff redirect to sign-in page, regular users also redirect
@@ -164,6 +189,13 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
         email: user.email,
         password: user.password,
       },
+    });
+
+    await createAuditLog({
+      action: "CREATE",
+      entity: "User",
+      entityName: user.name,
+      metadata: { email: user.email, registeredVia: "credentials" },
     });
 
     await signIn("credentials", {
@@ -235,6 +267,16 @@ export async function updateUserAddress(data: ShippingAddress) {
       data: { address },
     });
 
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "User",
+      entityId: currentUser.id,
+      entityName: currentUser.name,
+      changes: {
+        address: { old: currentUser.address, new: address },
+      },
+    });
+
     return {
       success: true,
       message: "User updated successfully",
@@ -264,6 +306,19 @@ export async function updateUserPaymentMethod(
     await prisma.user.update({
       where: { id: currentUser.id },
       data: { paymentMethod: paymentMethod.type },
+    });
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "User",
+      entityId: currentUser.id,
+      entityName: currentUser.name,
+      changes: {
+        paymentMethod: {
+          old: currentUser.paymentMethod,
+          new: paymentMethod.type,
+        },
+      },
     });
 
     return {
@@ -393,6 +448,22 @@ export async function getAllUsers({
 
 export async function deleteUser(userId: string) {
   try {
+    // Add this BEFORE prisma.user.delete
+    const userToDelete = await prisma.user.findFirst({ where: { id: userId } });
+
+    // Then after prisma.user.delete:
+    await createAuditLog({
+      action: "DELETE",
+      entity: "User",
+      entityId: userId,
+      entityName: userToDelete?.name,
+      metadata: {
+        email: userToDelete?.email,
+        role: userToDelete?.role,
+        deletedFrom: "admin-panel",
+      },
+    });
+
     await prisma.user.delete({
       where: { id: userId },
     });
@@ -437,6 +508,18 @@ export async function createUser(values: User) {
       },
     });
 
+    await createAuditLog({
+      action: "CREATE",
+      entity: "User",
+      entityId: res.id,
+      entityName: res.name,
+      metadata: {
+        email: res.email,
+        role: res.role,
+        createdFrom: "admin-panel",
+      },
+    });
+
     revalidatePath("/admin/users");
 
     return {
@@ -465,6 +548,26 @@ export async function updateUser(data: z.infer<typeof updateUserSchema>) {
       where: { id: user.id },
       data: user,
     });
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "User",
+      entityId: user.id,
+      entityName: user.name,
+      changes: {
+        ...(userExists.name !== user.name && {
+          name: { old: userExists.name, new: user.name },
+        }),
+        ...(userExists.role !== user.role && {
+          role: { old: userExists.role, new: user.role },
+        }),
+        ...(userExists.email !== user.email && {
+          email: { old: userExists.email, new: user.email },
+        }),
+      },
+      metadata: { updatedFrom: "admin-panel" },
+    });
+
     revalidatePath("/admin/users");
 
     return {
@@ -493,6 +596,19 @@ export async function updateUserProfile(user: { name: string; email: string }) {
       data: {
         name: user.name,
       },
+    });
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "User",
+      entityId: currentUser.id,
+      entityName: currentUser.name,
+      changes: {
+        ...(currentUser.name !== user.name && {
+          name: { old: currentUser.name, new: user.name },
+        }),
+      },
+      metadata: { updatedFrom: "profile-settings" },
     });
 
     return {
@@ -617,6 +733,17 @@ export async function resetPassword({
         where: { id: resetToken.id },
       }),
     ]);
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "User",
+      entityId: resetToken.userId,
+      entityName: resetToken.user.name,
+      changes: {
+        password: { old: "***", new: "***" },
+      },
+      metadata: { reason: "password-reset-via-token" },
+    });
 
     return {
       success: true,

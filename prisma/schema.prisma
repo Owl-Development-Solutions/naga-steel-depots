@@ -64,6 +64,7 @@ model User {
   reviews             Review[]
   notifications       Notification[]
   passwordResetTokens PasswordResetToken[]
+  auditLogs           AuditLog[]
 }
 
 model Account {
@@ -238,4 +239,29 @@ model Category {
   createdAt DateTime  @default(now()) @db.Timestamp(6)
   updatedAt DateTime  @updatedAt
   products  Product[]
+}
+
+model AuditLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?  @db.Uuid
+  userName   String?
+  userEmail  String?
+  userRole   String?
+  action     String // CREATE | UPDATE | DELETE | VIEW | LOGIN | LOGOUT | EXPORT
+  entity     String // Product | Order | User | Review | Category | ReturnRequest | Cart | Notification
+  entityId   String? // UUID of the affected record
+  entityName String? // human-readable label (e.g. product name, order #)
+  changes    Json?    @db.Json // { field: { old, new } } — only for UPDATE
+  metadata   Json?    @db.Json // extra context: IP, userAgent, reason, etc.
+  status     String   @default("success") // success | failure
+  errorMsg   String? // populated when status = failure
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([userEmail])
 }
