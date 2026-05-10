@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { convertToPlainObject, formatError } from "../utils";
+import { convertToPlainObject, formatCurrency, formatError } from "../utils";
 import { LATEST_PRODUCTS_LIMITS, PAGE_SIZE } from "../constants";
 import { Prisma } from "../generated/prisma/client";
 import { revalidatePath } from "next/cache";
@@ -13,6 +13,7 @@ import {
 } from "../validator";
 import { auth } from "@/auth";
 import { createProductUpdateNotification } from "./notification.actions";
+import { createAuditLog } from "./audit.actions";
 
 //Get latest products
 export const getLatestProducts = async () => {
@@ -119,7 +120,7 @@ export const getProductCardDetails = async () => {
       {
         title: "Revenue",
         icon: "creditCard",
-        amount: `₱${(revenue._sum.totalPrice || 0).toLocaleString()}`,
+        amount: formatCurrency((revenue._sum.totalPrice || 0).toLocaleString()),
         description: "Total paid sales",
         bgColor: "bg-primary",
       },
@@ -246,6 +247,18 @@ export async function deleteProduct(id: string) {
       where: { id },
     });
 
+    await createAuditLog({
+      action: "DELETE",
+      entity: "Product",
+      entityId: id,
+      entityName: productExists.name,
+      metadata: {
+        brand: productExists.brand,
+        price: productExists.price.toString(),
+        stock: productExists.stock,
+      },
+    });
+
     revalidatePath("/admin/products");
 
     return {
@@ -276,6 +289,19 @@ export async function createProduct(data: z.infer<typeof insertProductSchema>) {
     };
 
     const createdProduct = await prisma.product.create({ data: productData });
+
+    await createAuditLog({
+      action: "CREATE",
+      entity: "Product",
+      entityId: createdProduct.id,
+      entityName: createdProduct.name,
+      metadata: {
+        brand: createdProduct.brand,
+        price: createdProduct.price.toString(),
+        stock: createdProduct.stock,
+        categoryId: createdProduct.categoryId,
+      },
+    });
 
     // Create notification for other staff members
     if (userId) {
@@ -330,6 +356,47 @@ export async function updateProduct(data: z.infer<typeof updateProductSchema>) {
     });
 
     console.log("updatedProduct", updatedProduct);
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "Product",
+      entityId: updatedProduct.id,
+      entityName: updatedProduct.name,
+      changes: {
+        ...(productExists.name !== updatedProduct.name && {
+          name: { old: productExists.name, new: updatedProduct.name },
+        }),
+        ...(productExists.price.toString() !==
+          updatedProduct.price.toString() && {
+          price: {
+            old: productExists.price.toString(),
+            new: updatedProduct.price.toString(),
+          },
+        }),
+        ...(productExists.stock !== updatedProduct.stock && {
+          stock: { old: productExists.stock, new: updatedProduct.stock },
+        }),
+        ...(productExists.brand !== updatedProduct.brand && {
+          brand: { old: productExists.brand, new: updatedProduct.brand },
+        }),
+        ...(productExists.isFeatured !== updatedProduct.isFeatured && {
+          isFeatured: {
+            old: productExists.isFeatured,
+            new: updatedProduct.isFeatured,
+          },
+        }),
+        ...(productExists.categoryId !== updatedProduct.categoryId && {
+          categoryId: {
+            old: productExists.categoryId,
+            new: updatedProduct.categoryId,
+          },
+        }),
+      },
+      metadata: {
+        updatedFrom:
+          session?.user?.role === "admin" ? "admin-panel" : "staff-panel",
+      },
+    });
 
     // Create notification for other staff members
     if (userId) {

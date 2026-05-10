@@ -8,6 +8,7 @@ import { auth } from "@/auth";
 import { getUserById } from "./user.actions";
 import { createRestockFlagNotificationByStaff } from "./notification.actions";
 import { PAGE_SIZE } from "../constants";
+import { createAuditLog } from "./audit.actions";
 
 //STAFF FUNCTIONALITY  GOES HERE FILE JUST SEPARATED FOR VERCEL TIER FREE CAPACITY
 
@@ -367,6 +368,17 @@ export async function flagProductForRestock(productId: string) {
       data: { isFlagged: true },
     });
 
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "Product",
+      entityId: productId,
+      entityName: product.name,
+      changes: {
+        isFlagged: { old: false, new: true },
+      },
+      metadata: { reason: "flagged-for-restock", stock: product.stock },
+    });
+
     // Create notification for other staff members
     if (userId) {
       await createRestockFlagNotificationByStaff(
@@ -404,6 +416,17 @@ export async function unflagProduct(productId: string) {
       data: { isFlagged: false },
     });
 
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "Product",
+      entityId: productId,
+      entityName: product.name,
+      changes: {
+        isFlagged: { old: true, new: false },
+      },
+      metadata: { reason: "unflagged" },
+    });
+
     revalidatePath("/staff/inventory");
 
     return {
@@ -433,6 +456,16 @@ export async function updateProductThreshold(
     await prisma.product.update({
       where: { id: productId },
       data: { lowStockThreshold: threshold },
+    });
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "Product",
+      entityId: productId,
+      entityName: product.name,
+      changes: {
+        lowStockThreshold: { old: product.lowStockThreshold, new: threshold },
+      },
     });
 
     //update tbis
@@ -471,6 +504,20 @@ export async function restockProduct(
         stock: { increment: quantity },
         ...(unflag ? { isFlagged: false } : {}),
       },
+    });
+
+    await createAuditLog({
+      action: "UPDATE",
+      entity: "Product",
+      entityId: productId,
+      entityName: product.name,
+      changes: {
+        stock: { old: product.stock, new: product.stock + quantity },
+        ...(unflag && product.isFlagged
+          ? { isFlagged: { old: true, new: false } }
+          : {}),
+      },
+      metadata: { restockedQty: quantity, unflagged: unflag },
     });
 
     revalidatePath("/staff/low-stock");

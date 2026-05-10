@@ -9,8 +9,10 @@ import { cartItemSchema, insertCartSchema } from "@/lib/validator";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma/browser";
 import { getUserById } from "./user.actions";
+import { createAuditLog } from "./audit.actions";
 
-const normalize = (text: string | undefined | null) => (text || "").toLowerCase().replace(/[-\s]/g, "");
+const normalize = (text: string | undefined | null) =>
+  (text || "").toLowerCase().replace(/[-\s]/g, "");
 
 export async function addItemToCart(data: CartItem) {
   try {
@@ -67,6 +69,14 @@ export async function addItemToCart(data: CartItem) {
 
       console.log("New cart created in database");
 
+      await createAuditLog({
+        action: "CREATE",
+        entity: "Cart",
+        entityId: product.id,
+        entityName: product.name,
+        metadata: { productId: item.productId, qty: item.qty, sessionCartId },
+      });
+
       //revalidate product page
       revalidatePath(`/product/${product.slug}`);
 
@@ -113,6 +123,17 @@ export async function addItemToCart(data: CartItem) {
       });
 
       console.log("Cart updated in database");
+
+      await createAuditLog({
+        action: existItem ? "UPDATE" : "CREATE",
+        entity: "Cart",
+        entityId: cart.id,
+        entityName: product.name,
+        changes: existItem
+          ? { qty: { old: existItem.qty, new: existItem.qty + 1 } }
+          : undefined,
+        metadata: { productId: item.productId, sessionCartId },
+      });
 
       revalidatePath(`/product/${product.slug}`);
 
@@ -214,7 +235,7 @@ export async function removeItemFromCart(productId: string) {
     //get session and user id
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
-    
+
     // Only get user data if user is logged in
     let userAddress = "";
     if (userId) {
@@ -268,7 +289,7 @@ export async function setItemQty(productId: string, newQty: number) {
 
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
-    
+
     // Only get user data if user is logged in
     let userAddress = "";
     if (userId) {
@@ -377,7 +398,7 @@ export async function deleteItemFromCart(productId: string) {
 
     const session = await auth();
     const userId = session?.user?.id ? (session.user.id as string) : undefined;
-    
+
     // Only get user data if user is logged in
     let userAddress = "";
     if (userId) {

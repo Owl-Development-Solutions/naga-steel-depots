@@ -18,12 +18,12 @@ const links = [
     href: "/admin/orders",
   },
   {
-    title: "Users",
-    href: "/admin/users",
-  },
-  {
     title: "Audit Trail",
     href: "/admin/audit-trail",
+  },
+  {
+    title: "Users",
+    href: "/admin/users",
   },
 ];
 
