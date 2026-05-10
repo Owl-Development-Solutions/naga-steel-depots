@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -346,90 +354,239 @@ export default function LowStockMonitoringUI({
         </Alert>
       )}
 
-      {/* Product List */}
-      <div className="space-y-4 mt-8">
-        {!data || data.products.length === 0 ? (
-          <Card>
-            <CardContent className="p-6 text-center text-gray-500">
-              <Package className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-              <p>No low stock items found</p>
+      {/* Critical Products Table - Enhanced Layout */}
+      <div className="mt-8 space-y-6">
+        {/* Critical Products Summary */}
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* <Card className="border-l-4 border-red-500 bg-red-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-red-800">Critical Items</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {data?.products.filter(p => p.currentStock <= (p.threshold * 0.3)).length || 0}
+                  </p>
+                </div>
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card> */}
+
+          {/* <Card className="border-l-4 border-yellow-500 bg-yellow-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-yellow-800">Low Stock Items</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {data?.products.filter(p => p.currentStock > (p.threshold * 0.3) && p.currentStock <= p.threshold).length || 0}
+                  </p>
+                </div>
+                <Package className="w-8 h-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card> */}
+{/* 
+          <Card className="border-l-4 border-blue-500 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-800">Total Items</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {data?.products.length || 0}
+                  </p>
+                </div>
+                <Package className="w-8 h-8 text-blue-500" />
+              </div>
             </CardContent>
           </Card>
-        ) : (
-          filteredProducts?.map((item) => (
-            <Card key={item.id}>
-              <CardContent className="p-6 flex justify-between items-center gap-3">
-                <div className="">
-                  <Image
-                    src={item.image}
-                    width={70}
-                    height={70}
-                    alt="product-image"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center mb-2 flex-wrap gap-2">
-                    <h3 className="font-semibold mr-3">{item.productName}</h3>
-                    <Badge
-                      className={getStockLevelColor(
-                        item.currentStock,
-                        item.threshold,
-                      )}
-                    >
-                      {getCriticalityLevel(item.currentStock, item.threshold)}
-                    </Badge>
-                    {item.isFlagged && (
-                      <Badge className="bg-blue-100 text-blue-800">
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Flagged
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    {item.category} • {item.currentStock}/{item.threshold} units
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Last updated: {new Date(item.lastUpdated).toLocaleString()}
-                  </p>
-                </div>
+        </div> */}
 
-                <div className="ml-4 flex gap-2">
-                  {item.isFlagged ? (
-                    <Button
-                      variant="outline"
-                      onClick={() => handleRestock(item.id, item.productName)}
-                      disabled={restockingId === item.id}
-                    >
-                      <RefreshCw
-                        className={`w-4 h-4 mr-2 ${restockingId === item.id ? "animate-spin" : ""}`}
-                      />
-                      Restock
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => handleFlag(item.id, item.productName)}
-                      >
-                        <AlertTriangle className="w-4 h-4 mr-2" />
-                        Flag
-                      </Button>
-                      <Button
-                        onClick={() => handleRestock(item.id, item.productName)}
-                        disabled={restockingId === item.id}
-                      >
-                        <RefreshCw
-                          className={`w-4 h-4 mr-2 ${restockingId === item.id ? "animate-spin" : ""}`}
-                        />
-                        Restock
-                      </Button>
-                    </>
-                  )}
+        {/* Detailed Products Table */}
+        <Card className="shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-100 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Critical Products Details</h2>
+                  <p className="text-sm text-gray-600">Products requiring immediate attention - sorted by urgency</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-red-100 text-red-800">
+                  {data?.products.filter(p => p.currentStock <= (p.threshold * 0.3)).length || 0} Critical
+                </Badge>
+                <Badge className="bg-yellow-100 text-yellow-800">
+                  {data?.products.filter(p => p.currentStock > (p.threshold * 0.3) && p.currentStock <= p.threshold).length || 0} Low Stock
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-gray-50 border-b sticky top-0">
+                  <TableRow>
+                    <TableHead className="font-semibold text-gray-700 w-[300px]">Product Information</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[120px]">Stock Status</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[100px]">Current</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[100px]">Threshold</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[120px]">Urgency Level</TableHead>
+                    <TableHead className="font-semibold text-gray-700 w-[150px]">Last Updated</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[180px]">Quick Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {!data || data.products.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <div className="flex flex-col items-center gap-4">
+                          <Package className="w-12 h-12 text-gray-400" />
+                          <div>
+                            <p className="text-gray-600 font-medium">No critical products found</p>
+                            <p className="text-sm text-gray-500">
+                              All products are above their minimum stock levels
+                            </p>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    // Sort products by urgency (critical first, then by stock percentage)
+                    [...(filteredProducts || [])].sort((a, b) => {
+                      const aCritical = a.currentStock <= (a.threshold * 0.3);
+                      const bCritical = b.currentStock <= (b.threshold * 0.3);
+                      const aPercent = (a.currentStock / a.threshold) * 100;
+                      const bPercent = (b.currentStock / b.threshold) * 100;
+                      
+                      if (aCritical && !bCritical) return -1;
+                      if (!aCritical && bCritical) return 1;
+                      return aPercent - bPercent;
+                    }).map((item) => {
+                      const isCritical = item.currentStock <= (item.threshold * 0.3);
+                      const stockPercentage = (item.currentStock / item.threshold) * 100;
+                      const urgencyLevel = isCritical ? 'CRITICAL' : stockPercentage <= 50 ? 'HIGH' : 'MEDIUM';
+                      const urgencyColor = isCritical ? 'red' : stockPercentage <= 50 ? 'orange' : 'yellow';
+                      
+                      return (
+                        <TableRow 
+                          key={item.id} 
+                          className={`hover:bg-gray-50 transition-colors ${
+                            isCritical ? 'bg-red-50 border-l-4 border-red-500' : 'bg-yellow-50 border-l-4 border-yellow-500'
+                          }`}
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                                isCritical ? '' : 'bg-yellow-100'
+                              }`}>
+                                <Package className={`w-6 h-6 ${
+                                  isCritical ? 'text-red-600' : 'text-yellow-600'
+                                }`} />
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-semibold text-gray-900">{item.productName}</div>
+                                <div className="text-sm text-gray-500">ID: {item.id}</div>
+                                <Badge variant="outline" className="bg-gray-50 mt-1">
+                                  {item.category || 'Uncategorized'}
+                                </Badge>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex flex-col items-center gap-1">
+                              <Badge 
+                                className={`${getStockLevelColor(item.currentStock, item.threshold)}`}
+                              >
+                                {getCriticalityLevel(item.currentStock, item.threshold)}
+                              </Badge>
+                              {isCritical && (
+                                <div className="flex items-center text-xs text-red-600 font-medium">
+                                  <AlertTriangle className="w-3 h-3 mr-1" />
+                                  CRITICAL
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className={`font-bold text-xl ${
+                              isCritical ? 'text-red-600' : 'text-yellow-600'
+                            }`}>
+                              {item.currentStock}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {Math.round(stockPercentage)}%
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="font-medium text-gray-700">{item.threshold}</div>
+                            <div className="text-xs text-gray-500">min</div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge className={`bg-${urgencyColor}-100 text-${urgencyColor}-800`}>
+                              {urgencyLevel}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm text-gray-600">
+                              {new Date(item.lastUpdated).toLocaleDateString()}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {new Date(item.lastUpdated).toLocaleTimeString()}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex gap-2 justify-center">
+                              {item.isFlagged ? (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleRestock(item.id, item.productName)}
+                                  disabled={restockingId === item.id}
+                                  className="flex-1"
+                                >
+                                  <RefreshCw
+                                    className={`w-4 h-4 mr-1 ${restockingId === item.id ? "animate-spin" : ""}`}
+                                  />
+                                  Restock
+                                </Button>
+                              ) : (
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleFlag(item.id, item.productName)}
+                                    className="flex-1"
+                                  >
+                                    <AlertTriangle className="w-4 h-4 mr-1" />
+                                    Flag
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => handleRestock(item.id, item.productName)}
+                                    disabled={restockingId === item.id}
+                                    className="flex-1"
+                                  >
+                                    <RefreshCw
+                                      className={`w-4 h-4 mr-1 ${restockingId === item.id ? "animate-spin" : ""}`}
+                                    />
+                                    Restock
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Restock Dialog */}
