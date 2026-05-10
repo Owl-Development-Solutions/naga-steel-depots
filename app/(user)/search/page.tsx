@@ -10,7 +10,7 @@ import { PagesTopLoader } from "nextjs-toploader/pages";
 
 const prices = [
   {
-    name: "₱1 to $50",
+    name: "₱1 to ₱50",
     value: "1-50",
   },
   {
@@ -26,7 +26,7 @@ const prices = [
     value: "201-500",
   },
   {
-    name: "₱501 to ₱1000",
+    name: "₱501 to ₱1,000",
     value: "501-1000",
   },
 ];
