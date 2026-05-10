@@ -11,6 +11,8 @@ import { auth } from "@/auth";
 import ReviewList from "./review-list";
 import Rating from "@/components/rating";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import ProductPromoPrice from "@/components/shared/product/product-promo-price";
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -49,6 +51,7 @@ const ProductDetailsPage = async (props: {
                 <ProductPrice
                   value={Number(product.price)}
                   className="rounded-full bg-green-100 text-green-700 px-5 py-2"
+                  promoPrice={Number(product.promoPrice)}
                 />
               </div>
             </div>
@@ -61,11 +64,17 @@ const ProductDetailsPage = async (props: {
           {/* Action Column */}
           <div>
             <Card>
-              <CardContent className="p-4">
+              <CardContent>
                 <div className="mb-2 flex justify-between">
                   <div>Price</div>
                   <div>
-                    <ProductPrice value={Number(product.price)} />
+                    {Number(product.promoPrice) > 0 ? (
+                      <>
+                        <ProductPromoPrice value={Number(product.promoPrice)} />
+                      </>
+                    ) : (
+                      <ProductPrice value={Number(product.price)} />
+                    )}
                   </div>
                 </div>
 
@@ -79,22 +88,21 @@ const ProductDetailsPage = async (props: {
                 </div>
                 {product.stock > 0 && (
                   <>
-                    <div className="flex-center flex-col gap-3">
+                    <div className="flex-center flex-col gap-3 mt-3">
                       <AddToCart
                         cart={cart}
                         item={{
                           productId: product.id,
                           name: product.name,
                           slug: product.slug,
-                          price: product.price,
+                          price:
+                            Number(product.promoPrice) > 0
+                              ? Number(product.promoPrice).toString()
+                              : product.price,
                           qty: 1,
                           image: product.images![0],
                         }}
                       />
-
-                      {/* <Button asChild variant="default">
-                        <Link href={`/cart`}>Proceed to cart</Link>
-                      </Button> */}
                     </div>
                   </>
                 )}
