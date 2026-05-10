@@ -166,3 +166,13 @@ export const calcPrice = (items: CartItem[], city: string) => {
 export const formatNumberWithComma = (value: number | string): string => {
   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
+
+export const formatValueJSON = (value: unknown) => {
+  if (value === null || value === undefined) return "—";
+
+  if (typeof value === "object") {
+    return JSON.stringify(value, null, 2);
+  }
+
+  return String(value);
+};

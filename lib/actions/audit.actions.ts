@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "@/db/prisma";
+import * as XLSX from "xlsx";
 
 export type AuditAction =
   | "CREATE"
@@ -177,4 +178,40 @@ export async function purgeOldAuditLogs(olderThanDays = 90) {
   });
 
   return { deleted: count };
+}
+
+export async function exportAuditLogs(filters: AuditLogFilters = {}) {
+  const { logs } = await getAuditLogs({
+    ...filters,
+    page: 1,
+    pageSize: 100000, // export all
+  });
+
+  const formattedLogs = logs.map((log) => ({
+    Date: new Date(log.createdAt).toLocaleString(),
+    User: log.userName ?? "N/A",
+    Email: log.userEmail ?? "N/A",
+    Role: log.userRole ?? "N/A",
+    Action: log.action,
+    Entity: log.entity,
+    EntityId: log.entityId ?? "",
+    EntityName: log.entityName ?? "",
+    Status: log.status,
+    Error: log.errorMsg ?? "",
+    Metadata: JSON.stringify(log.metadata ?? {}),
+    Changes: JSON.stringify(log.changes ?? {}),
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedLogs);
+
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "AuditLogs");
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: "xlsx",
+    type: "buffer",
+  });
+
+  return Buffer.from(excelBuffer).toString("base64");
 }
