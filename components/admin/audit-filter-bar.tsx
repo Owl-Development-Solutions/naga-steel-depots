@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CheckCheckIcon, X, XIcon } from "lucide-react";
+import { CheckCheckIcon, Download, X, XIcon } from "lucide-react";
 import type { AuditLogFilters } from "@/lib/actions/audit.actions";
 import { ACTIONS, ENTITIES } from "@/types";
 
@@ -17,12 +17,14 @@ interface AuditFilterBarProps {
   filters: AuditLogFilters;
   onChange: (f: AuditLogFilters) => void;
   onReset: () => void;
+  onExport: () => void;
 }
 
 export function AuditFilterBar({
   filters,
   onChange,
   onReset,
+  onExport,
 }: AuditFilterBarProps) {
   const set = (patch: Partial<AuditLogFilters>) =>
     onChange({ ...filters, ...patch, page: 1 });
@@ -163,18 +165,18 @@ export function AuditFilterBar({
           />
         </div>
 
-        {hasActiveFilters && (
+        <div className="flex flex-col gap-1.5 items-center justify-center">
+          <div className="h-4"></div>
           <Button
-            variant="destructive"
-            size="sm"
-            onClick={onReset}
-            className=""
+            onClick={onExport}
+            className="bg-[#1F4F70] hover:bg-[#173c56] text-white shadow-sm"
           >
-            <X className="w-3.5 h-3.5" />
-            Reset
+            <Download className="w-4 h-4 mr-2" />
+            Export
           </Button>
-        )}
-      </div>
+        </div>
+
+              </div>
     </div>
   );
 }

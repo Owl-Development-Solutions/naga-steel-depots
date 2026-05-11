@@ -79,19 +79,9 @@ export default function AuditTrailPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleExport}
-                className="bg-[#1F4F70] hover:bg-[#173c56] text-white shadow-sm"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
-
-              <span className="px-3 py-1.5 bg-indigo-50 text-[#173c56] text-sm font-semibold rounded-full border border-indigo-100">
-                {total.toLocaleString()} records
-              </span>
-            </div>
+            <span className="px-3 py-1.5 bg-indigo-50 text-[#173c56] text-sm font-semibold rounded-full border border-indigo-100">
+              {total.toLocaleString()} records
+            </span>
           </div>
         </div>
 
@@ -99,6 +89,7 @@ export default function AuditTrailPage() {
           filters={filters}
           onChange={setFilters}
           onReset={() => setFilters(DEFAULT_FILTERS)}
+          onExport={handleExport}
         />
 
         <AuditTable

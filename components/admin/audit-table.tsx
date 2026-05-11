@@ -28,7 +28,6 @@ interface AuditTableProps {
 
 const COLUMN_HEADERS = [
   "Timestamp",
-  "User",
   "Role",
   "Action",
   "Entity",
@@ -111,11 +110,6 @@ export function AuditTable({ logs, isPending, onViewLog }: AuditTableProps) {
                       <span className="text-xs text-slate-500 font-mono">
                         {formatDate(log.createdAt)}
                       </span>
-                    </TableCell>
-
-                    {/* User */}
-                    <TableCell className="px-4 py-3">
-                      <UserAvatar name={log.userName} email={log.userEmail} />
                     </TableCell>
 
                     {/* Role */}
