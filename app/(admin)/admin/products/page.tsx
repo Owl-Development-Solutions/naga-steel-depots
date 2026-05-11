@@ -1,9 +1,8 @@
-
 import { requireAdmin } from "@/lib/auth-guard";
-import ProductsClient from "./products-client";
+import ProductsTablePage from "./products-table-page";
 
 export default async function ProductsPage() {
   await requireAdmin();
 
-  return <ProductsClient />;
+  return <ProductsTablePage />;
 }

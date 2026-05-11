@@ -32,7 +32,7 @@ export default async function AdminLayout({
 
           <MainNav className="mx-6" />
           <div className="ml-auto items-center flex space-x-4">
-            <AdminSearch />
+            {/* <AdminSearch /> */}
             <Menu session={session} notifications={notifications} />
           </div>
         </div>

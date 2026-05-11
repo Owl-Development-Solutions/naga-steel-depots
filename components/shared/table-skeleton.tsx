@@ -5,29 +5,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "../ui/skeleton";
 
-export default function TableSkeleton({ rows = 5 }: { rows?: number }) {
+export function TableSkeleton({
+  cols,
+  rows = 8,
+}: {
+  cols: number;
+  rows?: number;
+}) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableCell colSpan={8}>
-            <div className="h-4 w-1/3 bg-muted animate-pulse rounded" />
-          </TableCell>
+    <>
+      {Array.from({ length: rows }).map((_, i) => (
+        <TableRow key={i} className="hover:bg-transparent border-slate-50">
+          {Array.from({ length: cols }).map((_, j) => (
+            <TableCell key={j} className="px-4 py-3">
+              <Skeleton className="h-4 rounded-md" />
+            </TableCell>
+          ))}
         </TableRow>
-      </TableHeader>
-
-      <TableBody>
-        {Array.from({ length: rows }).map((_, i) => (
-          <TableRow key={i}>
-            {Array.from({ length: 8 }).map((_, j) => (
-              <TableCell key={j}>
-                <div className="h-4 w-full bg-muted animate-pulse rounded" />
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+      ))}
+    </>
   );
 }
