@@ -116,8 +116,6 @@ export default function LowStockMonitoringUI({
     name: string;
   } | null>(null);
 
-  console.log("initialData", initialData);
-
   const handleRefresh = async () => {
     setIsRefreshing(true);
     const res = await getLowStockMonitoring({
@@ -372,7 +370,7 @@ export default function LowStockMonitoringUI({
             </CardContent>
           </Card> */}
 
-          {/* <Card className="border-l-4 border-yellow-500 bg-yellow-50">
+        {/* <Card className="border-l-4 border-yellow-500 bg-yellow-50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -385,7 +383,7 @@ export default function LowStockMonitoringUI({
               </div>
             </CardContent>
           </Card> */}
-{/* 
+        {/* 
           <Card className="border-l-4 border-blue-500 bg-blue-50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -410,16 +408,28 @@ export default function LowStockMonitoringUI({
                   <AlertTriangle className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-800">Critical Products Details</h2>
-                  <p className="text-sm text-gray-600">Products requiring immediate attention - sorted by urgency</p>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    Critical Products Details
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Products requiring immediate attention - sorted by urgency
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge className="bg-red-100 text-red-800">
-                  {data?.products.filter(p => p.currentStock <= (p.threshold * 0.3)).length || 0} Critical
+                  {data?.products.filter(
+                    (p) => p.currentStock <= p.threshold * 0.3,
+                  ).length || 0}{" "}
+                  Critical
                 </Badge>
                 <Badge className="bg-yellow-100 text-yellow-800">
-                  {data?.products.filter(p => p.currentStock > (p.threshold * 0.3) && p.currentStock <= p.threshold).length || 0} Low Stock
+                  {data?.products.filter(
+                    (p) =>
+                      p.currentStock > p.threshold * 0.3 &&
+                      p.currentStock <= p.threshold,
+                  ).length || 0}{" "}
+                  Low Stock
                 </Badge>
               </div>
             </div>
@@ -429,13 +439,27 @@ export default function LowStockMonitoringUI({
               <Table>
                 <TableHeader className="bg-gray-50 border-b sticky top-0">
                   <TableRow>
-                    <TableHead className="font-semibold text-gray-700 w-[300px]">Product Information</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-center w-[120px]">Stock Status</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-center w-[100px]">Current</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-center w-[100px]">Threshold</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-center w-[120px]">Urgency Level</TableHead>
-                    <TableHead className="font-semibold text-gray-700 w-[150px]">Last Updated</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-center w-[180px]">Quick Actions</TableHead>
+                    <TableHead className="font-semibold text-gray-700 w-[300px]">
+                      Product Information
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[120px]">
+                      Stock Status
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[100px]">
+                      Current
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[100px]">
+                      Threshold
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[120px]">
+                      Urgency Level
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 w-[150px]">
+                      Last Updated
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center w-[180px]">
+                      Quick Actions
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -445,7 +469,9 @@ export default function LowStockMonitoringUI({
                         <div className="flex flex-col items-center gap-4">
                           <Package className="w-12 h-12 text-gray-400" />
                           <div>
-                            <p className="text-gray-600 font-medium">No critical products found</p>
+                            <p className="text-gray-600 font-medium">
+                              No critical products found
+                            </p>
                             <p className="text-sm text-gray-500">
                               All products are above their minimum stock levels
                             </p>
@@ -455,117 +481,139 @@ export default function LowStockMonitoringUI({
                     </TableRow>
                   ) : (
                     // Sort products by urgency (critical first, then by stock percentage)
-                    [...(filteredProducts || [])].sort((a, b) => {
-                      const aCritical = a.currentStock <= (a.threshold * 0.3);
-                      const bCritical = b.currentStock <= (b.threshold * 0.3);
-                      const aPercent = (a.currentStock / a.threshold) * 100;
-                      const bPercent = (b.currentStock / b.threshold) * 100;
-                      
-                      if (aCritical && !bCritical) return -1;
-                      if (!aCritical && bCritical) return 1;
-                      return aPercent - bPercent;
-                    }).map((item) => {
-                      const isCritical = item.currentStock <= (item.threshold * 0.3);
-                      const stockPercentage = (item.currentStock / item.threshold) * 100;
-                      const urgencyLevel = isCritical ? 'CRITICAL' : stockPercentage <= 50 ? 'HIGH' : 'MEDIUM';
-                      const urgencyColor = isCritical ? 'red' : stockPercentage <= 50 ? 'orange' : 'yellow';
-                      
-                      return (
-                        <TableRow 
-                          key={item.id} 
-                          className={`hover:bg-gray-50 transition-colors ${
-                            isCritical ? 'bg-red-50 border-l-4 border-red-500' : 'bg-yellow-50 border-l-4 border-yellow-500'
-                          }`}
-                        >
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                                isCritical ? '' : 'bg-yellow-100'
-                              }`}>
-                                <Package className={`w-6 h-6 ${
-                                  isCritical ? 'text-red-600' : 'text-yellow-600'
-                                }`} />
-                              </div>
-                              <div className="flex-1">
-                                <div className="font-semibold text-gray-900">{item.productName}</div>
-                                <div className="text-sm text-gray-500">ID: {item.id}</div>
-                                <Badge variant="outline" className="bg-gray-50 mt-1">
-                                  {item.category || 'Uncategorized'}
-                                </Badge>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex flex-col items-center gap-1">
-                              <Badge 
-                                className={`${getStockLevelColor(item.currentStock, item.threshold)}`}
-                              >
-                                {getCriticalityLevel(item.currentStock, item.threshold)}
-                              </Badge>
-                              {isCritical && (
-                                <div className="flex items-center text-xs text-red-600 font-medium">
-                                  <AlertTriangle className="w-3 h-3 mr-1" />
-                                  CRITICAL
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className={`font-bold text-xl ${
-                              isCritical ? 'text-red-600' : 'text-yellow-600'
-                            }`}>
-                              {item.currentStock}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {Math.round(stockPercentage)}%
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="font-medium text-gray-700">{item.threshold}</div>
-                            <div className="text-xs text-gray-500">min</div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge className={`bg-${urgencyColor}-100 text-${urgencyColor}-800`}>
-                              {urgencyLevel}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-sm text-gray-600">
-                              {new Date(item.lastUpdated).toLocaleDateString()}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {new Date(item.lastUpdated).toLocaleTimeString()}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex gap-2 justify-center">
-                              {item.isFlagged ? (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleRestock(item.id, item.productName)}
-                                  disabled={restockingId === item.id}
-                                  className="flex-1"
+                    [...(filteredProducts || [])]
+                      .sort((a, b) => {
+                        const aCritical = a.currentStock <= a.threshold * 0.3;
+                        const bCritical = b.currentStock <= b.threshold * 0.3;
+                        const aPercent = (a.currentStock / a.threshold) * 100;
+                        const bPercent = (b.currentStock / b.threshold) * 100;
+
+                        if (aCritical && !bCritical) return -1;
+                        if (!aCritical && bCritical) return 1;
+                        return aPercent - bPercent;
+                      })
+                      .map((item) => {
+                        const isCritical =
+                          item.currentStock <= item.threshold * 0.3;
+                        const stockPercentage =
+                          (item.currentStock / item.threshold) * 100;
+                        const urgencyLevel = isCritical
+                          ? "CRITICAL"
+                          : stockPercentage <= 50
+                            ? "HIGH"
+                            : "MEDIUM";
+                        const urgencyColor = isCritical
+                          ? "red"
+                          : stockPercentage <= 50
+                            ? "orange"
+                            : "yellow";
+
+                        return (
+                          <TableRow
+                            key={item.id}
+                            className={`hover:bg-gray-50 transition-colors ${
+                              isCritical
+                                ? "bg-red-50 border-l-4 border-red-500"
+                                : "bg-yellow-50 border-l-4 border-yellow-500"
+                            }`}
+                          >
+                            <TableCell>
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                                    isCritical ? "" : "bg-yellow-100"
+                                  }`}
                                 >
-                                  <RefreshCw
-                                    className={`w-4 h-4 mr-1 ${restockingId === item.id ? "animate-spin" : ""}`}
+                                  <Package
+                                    className={`w-6 h-6 ${
+                                      isCritical
+                                        ? "text-red-600"
+                                        : "text-yellow-600"
+                                    }`}
                                   />
-                                  Restock
-                                </Button>
-                              ) : (
-                                <>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-semibold text-gray-900">
+                                    {item.productName}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    ID: {item.id}
+                                  </div>
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-gray-50 mt-1"
+                                  >
+                                    {item.category || "Uncategorized"}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="flex flex-col items-center gap-1">
+                                <Badge
+                                  className={`${getStockLevelColor(item.currentStock, item.threshold)}`}
+                                >
+                                  {getCriticalityLevel(
+                                    item.currentStock,
+                                    item.threshold,
+                                  )}
+                                </Badge>
+                                {isCritical && (
+                                  <div className="flex items-center text-xs text-red-600 font-medium">
+                                    <AlertTriangle className="w-3 h-3 mr-1" />
+                                    CRITICAL
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div
+                                className={`font-bold text-xl ${
+                                  isCritical
+                                    ? "text-red-600"
+                                    : "text-yellow-600"
+                                }`}
+                              >
+                                {item.currentStock}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {Math.round(stockPercentage)}%
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="font-medium text-gray-700">
+                                {item.threshold}
+                              </div>
+                              <div className="text-xs text-gray-500">min</div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Badge
+                                className={`bg-${urgencyColor}-100 text-${urgencyColor}-800`}
+                              >
+                                {urgencyLevel}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm text-gray-600">
+                                {new Date(
+                                  item.lastUpdated,
+                                ).toLocaleDateString()}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(
+                                  item.lastUpdated,
+                                ).toLocaleTimeString()}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="flex gap-2 justify-center">
+                                {item.isFlagged ? (
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handleFlag(item.id, item.productName)}
-                                    className="flex-1"
-                                  >
-                                    <AlertTriangle className="w-4 h-4 mr-1" />
-                                    Flag
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleRestock(item.id, item.productName)}
+                                    onClick={() =>
+                                      handleRestock(item.id, item.productName)
+                                    }
                                     disabled={restockingId === item.id}
                                     className="flex-1"
                                   >
@@ -574,13 +622,39 @@ export default function LowStockMonitoringUI({
                                     />
                                     Restock
                                   </Button>
-                                </>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
+                                ) : (
+                                  <>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleFlag(item.id, item.productName)
+                                      }
+                                      className="flex-1"
+                                    >
+                                      <AlertTriangle className="w-4 h-4 mr-1" />
+                                      Flag
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleRestock(item.id, item.productName)
+                                      }
+                                      disabled={restockingId === item.id}
+                                      className="flex-1"
+                                    >
+                                      <RefreshCw
+                                        className={`w-4 h-4 mr-1 ${restockingId === item.id ? "animate-spin" : ""}`}
+                                      />
+                                      Restock
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                   )}
                 </TableBody>
               </Table>

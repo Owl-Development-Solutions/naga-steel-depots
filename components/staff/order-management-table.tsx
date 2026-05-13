@@ -33,18 +33,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  ShoppingCart, 
-  Eye, 
-  Edit, 
-  Package, 
-  User, 
+import {
+  ShoppingCart,
+  Eye,
+  Edit,
+  Package,
+  User,
   Calendar,
   Search,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
-  Truck
+  Truck,
 } from "lucide-react";
 
 import { formatDateTime } from "@/lib/utils";
@@ -99,14 +99,14 @@ const getStatusColor = (status: string) => {
 };
 
 const getPaymentStatusColor = (isPaid: boolean) => {
-  return isPaid 
-    ? "bg-green-100 text-green-800 border-green-200" 
+  return isPaid
+    ? "bg-green-100 text-green-800 border-green-200"
     : "bg-orange-100 text-orange-800 border-orange-200";
 };
 
 const getDeliveryStatusColor = (isDelivered: boolean) => {
-  return isDelivered 
-    ? "bg-green-100 text-green-800 border-green-200" 
+  return isDelivered
+    ? "bg-green-100 text-green-800 border-green-200"
     : "bg-gray-100 text-gray-800 border-gray-200";
 };
 
@@ -134,10 +134,10 @@ export default function OrderManagementTable({
   const renderPagination = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage < maxVisiblePages - 1) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -157,7 +157,7 @@ export default function OrderManagementTable({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        
+
         {startPage > 1 && (
           <>
             <Button
@@ -171,7 +171,7 @@ export default function OrderManagementTable({
             {startPage > 2 && <span className="px-2">...</span>}
           </>
         )}
-        
+
         {pages.map((page) => (
           <Button
             key={page}
@@ -183,7 +183,7 @@ export default function OrderManagementTable({
             {page}
           </Button>
         ))}
-        
+
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && <span className="px-2">...</span>}
@@ -197,7 +197,7 @@ export default function OrderManagementTable({
             </Button>
           </>
         )}
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -219,35 +219,26 @@ export default function OrderManagementTable({
           <ShoppingCart className="w-6 h-6 text-blue-600" />
           <h1 className="text-xl font-semibold">Order Management</h1>
         </div>
-        
-        {/* <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center w-full sm:w-auto"> */}
-          {/* Search */}
-          {/* <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search orders..."
-              value={searchInput}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div> */}
-          
-          {/* Limit Selector */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 whitespace-nowrap">Show:</span>
-            <Select value={currentLimit.toString()} onValueChange={(value) => onLimitChange(Number(value))}>
-              <SelectTrigger className="w-16">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {paginationOptions.map((limit) => (
-                  <SelectItem key={limit} value={limit.toString()}>
-                    {limit}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+
+        {/* Limit Selector */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600 whitespace-nowrap">Show:</span>
+          <Select
+            value={currentLimit.toString()}
+            onValueChange={(value) => onLimitChange(Number(value))}
+          >
+            <SelectTrigger className="w-16">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {paginationOptions.map((limit) => (
+                <SelectItem key={limit} value={limit.toString()}>
+                  {limit}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         {/* </div> */}
       </div>
 
@@ -265,7 +256,9 @@ export default function OrderManagementTable({
               <TableHead className="font-semibold">Delivery</TableHead>
               <TableHead className="font-semibold">Driver</TableHead>
               <TableHead className="font-semibold">Date</TableHead>
-              <TableHead className="font-semibold text-center">Actions</TableHead>
+              <TableHead className="font-semibold text-center">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -274,74 +267,90 @@ export default function OrderManagementTable({
                 <TableRow key={order.id} className="transition-colors">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">#{order.id.slice(-8)}</span>
+                      <span className="text-xs text-gray-500">
+                        #{order.id.slice(-8)}
+                      </span>
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <User className="w-4 h-4 text-gray-400" />
                       <span className="font-medium">{order.user.name}</span>
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Package className="w-4 h-4 text-gray-400" />
                       <span>{order.orderitems.length} items</span>
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
                     <span className="font-semibold text-green-600">
                       ₱{order.totalPrice.toLocaleString()}
                     </span>
                   </TableCell>
-                  
+
                   <TableCell>
-                    <Badge className={`text-xs font-medium ${getStatusColor(order.status)}`}>
+                    <Badge
+                      className={`text-xs font-medium ${getStatusColor(order.status)}`}
+                    >
                       {order.status}
                     </Badge>
                   </TableCell>
-                  
+
                   <TableCell>
-                    <Badge className={`text-xs font-medium ${getPaymentStatusColor(order.isPaid)}`}>
+                    <Badge
+                      className={`text-xs font-medium ${getPaymentStatusColor(order.isPaid)}`}
+                    >
                       {order.isPaid ? "Paid" : "Unpaid"}
                     </Badge>
                   </TableCell>
-                  
+
                   <TableCell>
-                    <Badge className={`text-xs font-medium ${getDeliveryStatusColor(order.isDelivered)}`}>
+                    <Badge
+                      className={`text-xs font-medium ${getDeliveryStatusColor(order.isDelivered)}`}
+                    >
                       {order.isDelivered ? "Delivered" : "Pending"}
                     </Badge>
                   </TableCell>
-                  
+
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {order.deliveryDriver ? (
                         <>
                           <Truck className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm">{order.deliveryDriver}</span>
+                          <span className="text-sm">
+                            {order.deliveryDriver}
+                          </span>
                         </>
                       ) : (
-                        <span className="text-sm text-gray-400">Not assigned</span>
+                        <span className="text-sm text-gray-400">
+                          Not assigned
+                        </span>
                       )}
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <Calendar className="w-3 h-3" />
                       {formatDateTime(new Date(order.createdAt)).dateTime}
                     </div>
                   </TableCell>
-                  
+
                   <TableCell>
                     <div className="flex justify-center">
                       <Dialog>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -364,7 +373,7 @@ export default function OrderManagementTable({
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        
+
                         <DialogContent className="!max-w-4xl max-h-[90vh]">
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
@@ -372,7 +381,10 @@ export default function OrderManagementTable({
                               Order Details
                             </DialogTitle>
                           </DialogHeader>
-                          <OrderDetailsClient orderId={order.id} type="read-only" />
+                          <OrderDetailsClient
+                            orderId={order.id}
+                            type="read-only"
+                          />
                         </DialogContent>
                       </Dialog>
                     </div>
