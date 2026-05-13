@@ -1,4 +1,6 @@
 import { AuditAction, AuditEntity } from "@/lib/actions/audit.actions";
+import { getAllOrders } from "@/lib/actions/order.actions";
+import { Prisma } from "@/lib/generated/prisma/client";
 import {
   cartItemSchema,
   createUserSchema,
@@ -29,15 +31,48 @@ export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
 export type OrderItem = z.infer<typeof insertOrderItemSchema>;
 export type Order = z.infer<typeof insertOrderSchema> & {
   id: string;
-  createdAt: Date;
-  isPaid: Boolean;
-  paidAt: Date | null;
-  isDelivered: Boolean;
-  deliveredAt: Date | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isPaid?: boolean;
+  paidAt?: Date | null;
+  paymentResult?: PaymentResult | null;
+  isDelivered?: boolean;
+  deliveredAt?: Date | null;
+  estimatedDelivery?: Date | null;
+  estimatedDeliveryEnd?: Date | null;
+  trackingNumber?: string | null;
+  carrier?: string | null;
+  deliveryDriver?: string | null;
+  driverPhone?: string | null;
+  status?: string;
+  cancelReason?: string | null;
+  cancelledAt?: Date | null;
+  isReturned?: boolean;
+  returnStatus?: string | null;
+  notes?: string | null;
   orderitems: OrderItem[];
-  user: { name: string; email: string };
-  paymentResult: PaymentResult;
+  user: { name: string | null; email: string };
 };
+
+export type OrderWithRelations = Prisma.OrderGetPayload<{
+  include: {
+    user: {
+      select: {
+        name: true;
+      };
+    };
+    orderitems: {
+      select: {
+        product: true;
+      };
+    };
+  };
+}>;
+
+export type OrderTableType = Awaited<
+  ReturnType<typeof getAllOrders>
+>["data"][number];
+
 export type PaymentResult = z.infer<typeof paymentResultSchema>;
 
 // User types

@@ -5,7 +5,13 @@ import { getMyCart } from "./cart.actions";
 import { getUserById } from "./user.actions";
 import { insertOrderSchema } from "../validator";
 import { prisma } from "@/db/prisma";
-import { CartItem, PaymentResult, ShippingAddress } from "@/types";
+import {
+  CartItem,
+  Order,
+  OrderWithRelations,
+  PaymentResult,
+  ShippingAddress,
+} from "@/types";
 import {
   calcPrice,
   convertToPlainObject,
@@ -20,6 +26,7 @@ import { PAGE_SIZE } from "../constants";
 import { sendPurchaseReceipt } from "@/emails";
 import { createOrderPlacedNotification } from "./notification.actions";
 import { createAuditLog } from "./audit.actions";
+import { DataTableFilters } from "@/types/table-types";
 
 //create order and create the order items
 // export async function createOrder() {
@@ -421,6 +428,7 @@ async function updateOrderToPaid({
         isPaid: true,
         paidAt: new Date(),
         paymentResult,
+        status: "processing",
       },
     });
   });
@@ -585,27 +593,54 @@ export async function getAllOrders({
   limit = PAGE_SIZE,
   page,
   query,
+  status,
+  payment,
+  date,
 }: {
   limit?: number;
   page: number;
-  query: string;
+  query?: string;
+  status?: string;
+  payment?: string;
+  date?: string;
 }) {
-  const queryFilter: Prisma.OrderWhereInput =
-    query && query !== "all"
-      ? {
-          user: {
-            name: {
-              contains: query,
-              mode: "insensitive",
-            } as Prisma.StringFilter,
-          },
-        }
-      : {};
+  const where: Prisma.OrderWhereInput = {};
+
+  if (query && query !== "all") {
+    where.user = {
+      name: {
+        contains: query,
+        mode: "insensitive",
+      },
+    };
+  }
+
+  if (status) {
+    where.status = status;
+  }
+
+  if (payment === "paid") {
+    where.isPaid = true;
+  }
+
+  if (payment === "unpaid") {
+    where.isPaid = false;
+  }
+
+  if (date) {
+    const startDate = new Date(date);
+
+    const endDate = new Date(date);
+    endDate.setDate(endDate.getDate() + 1);
+
+    where.createdAt = {
+      gte: startDate,
+      lt: endDate,
+    };
+  }
 
   const data = await prisma.order.findMany({
-    where: {
-      ...queryFilter,
-    },
+    where,
     orderBy: { createdAt: "desc" },
     take: limit,
     skip: (page - 1) * limit,
@@ -615,7 +650,9 @@ export async function getAllOrders({
     },
   });
 
-  const dataCount = await prisma.order.count();
+  const dataCount = await prisma.order.count({
+    where,
+  });
 
   return {
     data: convertToPlainObject(data),
@@ -691,6 +728,7 @@ export async function deliverOrder(orderId: string) {
       data: {
         isDelivered: true,
         deliveredAt: new Date(),
+        status: "delivered",
       },
     });
 
@@ -720,13 +758,14 @@ export async function deliverOrder(orderId: string) {
   }
 }
 
-//get user's orders
 export async function getMyOrders({
   limit = PAGE_SIZE,
   page,
+  filters,
 }: {
   limit?: number;
   page: number;
+  filters?: DataTableFilters;
 }) {
   const session = await auth();
   const userId = session?.user?.id;
@@ -735,19 +774,82 @@ export async function getMyOrders({
     throw new Error("User not authorized");
   }
 
+  // Build where clause based on filters
+  const where: any = { userId };
+
+  // Filter by status
+  if (filters?.status && filters.status !== "all") {
+    where.status = filters.status;
+  }
+
+  // Filter by payment status
+  if (filters?.payment && filters.payment !== "all") {
+    where.isPaid = filters.payment === "paid";
+  }
+
+  // Search by order ID
+  if (filters?.search) {
+    where.id = {
+      contains: filters.search,
+      mode: "insensitive",
+    };
+  }
+
+  // Filter by date
+  if (filters?.date) {
+    const startDate = new Date(filters.date);
+    const endDate = new Date(filters.date);
+    endDate.setHours(23, 59, 59, 999);
+
+    where.createdAt = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
+  // Build orderBy based on sort
+  let orderBy: any = { createdAt: "desc" };
+
+  if (filters?.sort && filters?.sortDir) {
+    orderBy = { [filters.sort]: filters.sortDir };
+  }
+
   const data = await prisma.order.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
+    where,
+    orderBy,
     take: limit,
     skip: (page - 1) * limit,
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      orderitems: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              images: true,
+            },
+          },
+        },
+      },
+    },
   });
 
-  const dataCount = await prisma.order.count({
-    where: { userId },
-  });
+  const formattedData = data.map((order) => ({
+    ...order,
+    shippingAddress: order.shippingAddress as Order["shippingAddress"],
+    paymentResult: order.paymentResult as OrderWithRelations["paymentResult"],
+  }));
+
+  const dataCount = await prisma.order.count({ where });
 
   return {
-    data,
+    data: formattedData,
     totalPages: Math.ceil(dataCount / limit),
+    total: dataCount,
   };
 }
