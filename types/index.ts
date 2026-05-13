@@ -23,6 +23,7 @@ export type Product = z.infer<typeof insertProductSchema> & {
   createdAt: Date;
   _count?: any;
   category?: { id: string; name: string } | null;
+  updatedAt?: Date;
 };
 
 export type Cart = z.infer<typeof insertCartSchema>;
@@ -182,3 +183,39 @@ export function formatDate(date: Date | string) {
     second: "2-digit",
   }).format(new Date(date));
 }
+
+export type StaffOrder = Prisma.OrderGetPayload<{
+  include: {
+    user: {
+      select: {
+        name: true;
+        email: true;
+      };
+    };
+    orderitems: {
+      include: {
+        product: {
+          select: {
+            name: true;
+            slug: true;
+            images: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
+export type StaffOrderRow = Omit<
+  StaffOrder,
+  "itemsPrice" | "shippingPrice" | "taxPrice" | "totalPrice" | "orderitems"
+> & {
+  itemsPrice: string;
+  shippingPrice: string;
+  taxPrice: string;
+  totalPrice: string;
+
+  orderitems: (Omit<StaffOrder["orderitems"][number], "price"> & {
+    price: string;
+  })[];
+};

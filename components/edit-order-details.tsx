@@ -26,18 +26,18 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { updateOrderStatusAndDriver } from "@/lib/actions/delivery.actions";
 import { toast } from "sonner";
-import { 
-  Pencil, 
-  Truck, 
-  Package, 
-  Calendar, 
+import {
+  Pencil,
+  Truck,
+  Package,
+  Calendar,
   Edit3,
   AlertTriangle,
   CheckCircle,
   Info,
   User,
   MapPin,
-  Phone
+  Phone,
 } from "lucide-react";
 
 interface Driver {
@@ -56,11 +56,36 @@ interface EditOrderDetailsProps {
 }
 
 const orderStatuses = [
-  { value: "pending", label: "Pending", description: "Order received but not processed", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-  { value: "processing", label: "Processing", description: "Order is being prepared", color: "bg-blue-100 text-blue-800 border-blue-200" },
-  { value: "shipped", label: "Shipped", description: "Order is on the way", color: "bg-purple-100 text-purple-800 border-purple-200" },
-  { value: "delivered", label: "Delivered", description: "Order has been delivered", color: "bg-green-100 text-green-800 border-green-200" },
-  { value: "cancelled", label: "Cancelled", description: "Order has been cancelled", color: "bg-red-100 text-red-800 border-red-200" },
+  {
+    value: "pending",
+    label: "Pending",
+    description: "Order received but not processed",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  },
+  {
+    value: "processing",
+    label: "Processing",
+    description: "Order is being prepared",
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+  },
+  {
+    value: "shipped",
+    label: "Shipped",
+    description: "Order is on the way",
+    color: "bg-purple-100 text-purple-800 border-purple-200",
+  },
+  {
+    value: "delivered",
+    label: "Delivered",
+    description: "Order has been delivered",
+    color: "bg-green-100 text-green-800 border-green-200",
+  },
+  {
+    value: "cancelled",
+    label: "Cancelled",
+    description: "Order has been cancelled",
+    color: "bg-red-100 text-red-800 border-red-200",
+  },
 ];
 
 const carriers = [
@@ -88,9 +113,9 @@ const EditOrderDetails = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Find current driver ID from driver name
-  const currentDriverId = drivers.find(driver => 
-    driver.address?.fullName === currentDriver
-  )?.id || "";
+  const currentDriverId =
+    drivers.find((driver) => driver.address?.fullName === currentDriver)?.id ||
+    "";
 
   // Initialize form when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
@@ -136,13 +161,13 @@ const EditOrderDetails = ({
       if (result.success) {
         toast.success("Order updated successfully!");
         setOpen(false);
-        
+
         // Reset form
         setSelectedDriver("");
         setTrackingNumber("");
         setSelectedCarrier("");
         setNotes("");
-        
+
         // Call the refresh callback
         if (onOrderUpdated) {
           onOrderUpdated();
@@ -160,7 +185,7 @@ const EditOrderDetails = ({
 
   const handleStatusChange = (status: string) => {
     setSelectedStatus(status);
-    
+
     // Auto-clear driver if status is cancelled or delivered
     if (status === "cancelled" || status === "delivered") {
       setSelectedDriver("none");
@@ -168,7 +193,7 @@ const EditOrderDetails = ({
   };
 
   const getStatusDescription = (status: string) => {
-    const statusInfo = orderStatuses.find(s => s.value === status);
+    const statusInfo = orderStatuses.find((s) => s.value === status);
     return statusInfo?.description || "";
   };
 
@@ -209,14 +234,23 @@ const EditOrderDetails = ({
                     <Package className="w-6 h-6 text-gray-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground font-medium">Order ID</p>
-                    <p className="font-mono text-lg font-semibold">#{orderId.slice(-8)}</p>
+                    <p className="text-sm text-muted-foreground font-medium">
+                      Order ID
+                    </p>
+                    <p className="font-mono text-lg font-semibold">
+                      #{orderId.slice(-8)}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground font-medium mb-2">Current Status</p>
-                  <Badge className={`${orderStatuses.find(s => s.value === currentStatus)?.color || 'bg-gray-100 text-gray-800 border-gray-200'} px-3 py-1`}>
-                    {orderStatuses.find(s => s.value === currentStatus)?.label || currentStatus}
+                  <p className="text-sm text-muted-foreground font-medium mb-2">
+                    Current Status
+                  </p>
+                  <Badge
+                    className={`${orderStatuses.find((s) => s.value === currentStatus)?.color || "bg-gray-100 text-gray-800 border-gray-200"} px-3 py-1`}
+                  >
+                    {orderStatuses.find((s) => s.value === currentStatus)
+                      ?.label || currentStatus}
                   </Badge>
                 </div>
               </div>
@@ -236,7 +270,10 @@ const EditOrderDetails = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Select value={selectedStatus} onValueChange={handleStatusChange}>
+                <Select
+                  value={selectedStatus}
+                  onValueChange={handleStatusChange}
+                >
                   <SelectTrigger id="status" className="h-11">
                     <SelectValue placeholder="Select order status" />
                   </SelectTrigger>
@@ -257,7 +294,13 @@ const EditOrderDetails = ({
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 text-muted-foreground mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium">{orderStatuses.find(s => s.value === selectedStatus)?.label}</p>
+                        <p className="text-sm font-medium">
+                          {
+                            orderStatuses.find(
+                              (s) => s.value === selectedStatus,
+                            )?.label
+                          }
+                        </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {getStatusDescription(selectedStatus)}
                         </p>
@@ -279,8 +322,8 @@ const EditOrderDetails = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Select 
-                  value={selectedDriver || currentDriverId || "none"} 
+                <Select
+                  value={selectedDriver || currentDriverId || "none"}
                   onValueChange={setSelectedDriver}
                 >
                   <SelectTrigger id="driver" className="h-11">
@@ -290,7 +333,9 @@ const EditOrderDetails = ({
                     <SelectItem value="none">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-500">No Driver Assigned</span>
+                        <span className="text-gray-500">
+                          No Driver Assigned
+                        </span>
                       </div>
                     </SelectItem>
                     {drivers.map((driver) => (
@@ -298,7 +343,9 @@ const EditOrderDetails = ({
                         <div>
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4 text-blue-500" />
-                            <span className="font-medium">{driver.address?.fullName || driver.name}</span>
+                            <span className="font-medium">
+                              {driver.address?.fullName || driver.name}
+                            </span>
                           </div>
                           {driver.phoneNumber && (
                             <div className="flex items-center gap-1 text-xs text-muted-foreground ml-6">
@@ -401,9 +448,12 @@ const EditOrderDetails = ({
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-yellow-600 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-yellow-800">Order Cancellation Warning</h4>
+                    <h4 className="font-semibold text-yellow-800">
+                      Order Cancellation Warning
+                    </h4>
                     <p className="text-sm text-yellow-700 mt-1">
-                      Cancelling this order will mark it as cancelled. This action cannot be easily undone.
+                      Cancelling this order will mark it as cancelled. This
+                      action cannot be easily undone.
                     </p>
                   </div>
                 </div>
@@ -417,9 +467,12 @@ const EditOrderDetails = ({
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-green-800">Order Completion</h4>
+                    <h4 className="font-semibold text-green-800">
+                      Order Completion
+                    </h4>
                     <p className="text-sm text-green-700 mt-1">
-                      Marking this order as delivered will complete the order process.
+                      Marking this order as delivered will complete the order
+                      process.
                     </p>
                   </div>
                 </div>
@@ -439,9 +492,9 @@ const EditOrderDetails = ({
           >
             Cancel
           </Button>
-          <Button 
-            type="button" 
-            onClick={handleSubmit} 
+          <Button
+            type="button"
+            onClick={handleSubmit}
             disabled={isSubmitting || !selectedStatus}
             className="h-11 px-6 min-w-[140px]"
           >

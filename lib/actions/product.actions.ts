@@ -14,6 +14,7 @@ import {
 import { auth } from "@/auth";
 import { createProductUpdateNotification } from "./notification.actions";
 import { createAuditLog } from "./audit.actions";
+import { DataTableFilters } from "@/types/table-types";
 
 //Get latest products
 export const getLatestProducts = async () => {
@@ -241,6 +242,148 @@ export async function getAllProducts({
   return {
     data: convertToPlainObject(data),
     totalPage: Math.ceil(dataCount / limit),
+  };
+}
+
+export async function getAllProductsForStaff({
+  limit = PAGE_SIZE,
+  page = 1,
+  filters,
+}: {
+  limit?: number;
+  page?: number;
+  filters?: DataTableFilters;
+}) {
+  const where: Prisma.ProductWhereInput = {};
+
+  if (filters?.search) {
+    where.OR = [
+      {
+        name: {
+          contains: filters.search,
+          mode: "insensitive",
+        },
+      },
+      {
+        brand: {
+          contains: filters.search,
+          mode: "insensitive",
+        },
+      },
+    ];
+  }
+
+  // Filter by category
+  if (filters?.category && filters.category !== "all") {
+    where.categoryId = filters.category;
+  }
+
+  // Filter by stock level
+  if (filters?.stockLevel && filters.stockLevel !== "all") {
+    switch (filters.stockLevel) {
+      case "low":
+        where.stock = {
+          gt: 0,
+          lte: 10,
+        };
+        break;
+
+      case "medium":
+        where.stock = {
+          gt: 10,
+          lte: 50,
+        };
+        break;
+
+      case "good":
+        where.stock = {
+          gt: 50,
+        };
+        break;
+
+      case "out":
+        where.stock = {
+          equals: 0,
+        };
+        break;
+    }
+  }
+
+  // Filter by featured status
+  if (filters?.featured && filters.featured !== "all") {
+    where.isFeatured = filters.featured === "yes";
+  }
+
+  // Sorting
+  let orderBy: Prisma.ProductOrderByWithRelationInput = {
+    createdAt: "desc",
+  };
+
+  if (filters?.sort && filters?.sortDir) {
+    orderBy = {
+      [filters.sort]: filters.sortDir,
+    };
+  }
+
+  const data = await prisma.product.findMany({
+    where,
+    orderBy,
+    take: limit,
+    skip: (page - 1) * limit,
+    include: {
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  const dataCount = await prisma.product.count({
+    where,
+  });
+
+  const summaryProducts = await prisma.product.findMany({
+    where,
+    select: {
+      stock: true,
+      price: true,
+    },
+  });
+
+  const summary = summaryProducts.reduce(
+    (acc, product) => {
+      const stock = Number(product.stock);
+      const price = Number(product.price);
+
+      // Total inventory value
+      acc.totalValue += stock * price;
+
+      // Stock counters
+      if (stock === 0) {
+        acc.outOfStockCount++;
+      } else if (stock <= 10) {
+        acc.lowStockCount++;
+      } else {
+        acc.inStockCount++;
+      }
+
+      return acc;
+    },
+    {
+      totalValue: 0,
+      lowStockCount: 0,
+      inStockCount: 0,
+      outOfStockCount: 0,
+    },
+  );
+
+  return {
+    data: convertToPlainObject(data),
+    totalPages: Math.ceil(dataCount / limit),
+    total: dataCount,
+    summary,
   };
 }
 

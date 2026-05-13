@@ -588,7 +588,7 @@ export async function getOrderCardDetails() {
   }
 }
 
-//get all orders
+//get all orders for admin
 export async function getAllOrders({
   limit = PAGE_SIZE,
   page,
@@ -657,6 +657,110 @@ export async function getAllOrders({
   return {
     data: convertToPlainObject(data),
     totalPages: Math.ceil(dataCount / limit),
+  };
+}
+
+export async function getAllOrdersForStaff({
+  limit = PAGE_SIZE,
+  page,
+  filters,
+}: {
+  limit?: number;
+  page: number;
+  filters?: DataTableFilters;
+}) {
+  const where: Prisma.OrderWhereInput = {};
+
+  if (filters?.search) {
+    where.OR = [
+      {
+        user: {
+          name: {
+            contains: filters.search,
+            mode: "insensitive",
+          },
+        },
+      },
+    ];
+  }
+
+  if (filters?.status && filters.status !== "all") {
+    where.status = filters.status;
+  }
+
+  if (filters?.payment && filters.payment !== "all") {
+    where.isPaid = filters.payment === "paid";
+  }
+
+  if (filters?.delivery && filters.delivery !== "all") {
+    where.isDelivered = filters.delivery === "delivered";
+  }
+
+  if (filters?.driver && filters.driver !== "all") {
+    if (filters.driver === "unassigned") {
+      where.deliveryDriver = null;
+    } else {
+      where.deliveryDriver = {
+        contains: filters.driver,
+        mode: "insensitive",
+      };
+    }
+  }
+
+  if (filters?.date) {
+    const startDate = new Date(filters.date);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(filters.date);
+    endDate.setHours(23, 59, 59, 999);
+
+    where.createdAt = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
+  // Build orderBy based on sort
+  let orderBy: any = { createdAt: "desc" };
+
+  if (filters?.sort && filters?.sortDir) {
+    orderBy = { [filters.sort]: filters.sortDir };
+  }
+
+  console.log(where);
+
+  const data = await prisma.order.findMany({
+    where,
+    orderBy,
+    take: limit,
+    skip: (page - 1) * limit,
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      orderitems: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              images: true,
+              slug: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const dataCount = await prisma.order.count({ where });
+
+  return {
+    data: convertToPlainObject(data),
+    totalPages: Math.ceil(dataCount / limit),
+    total: dataCount,
   };
 }
 

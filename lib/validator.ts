@@ -25,7 +25,7 @@ export const insertProductSchema = z
   .object({
     name: z.string().min(3, "Name must be at lest 3 characters"),
     slug: z.string().optional(),
-    categoryId: z.string().min(3, "Category is required"),
+    categoryId: z.string().nullable().optional(),
     brand: z.string(),
     description: z.string().min(3, "Description must be at lest 3 characters"),
     stock: z.coerce.number(),
